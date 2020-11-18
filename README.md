@@ -46,6 +46,36 @@ docker run -itd \
   ericwang2006/ttnode
 ```
 
+## 方法三: docker-compose
+
+```
+version: '2'
+
+services:     
+  ttnode:
+    image: ericwang2006/ttnode
+    container_name: ttnode
+    privileged: true
+    restart: always
+    mac_address: C2:F2:9C:C5:B2:94
+    dns: 114.114.114.114
+    networks: 
+      macvlan:
+        ipv4_address: 192.168.2.2
+    volumes:
+      - /mnt/data/ttnode:/mnts
+
+networks:
+  macvlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
+          gateway: 192.168.2.1
+```
+
 ## 进入容器：
 
 ```
