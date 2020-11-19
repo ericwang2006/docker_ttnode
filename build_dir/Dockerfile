@@ -5,7 +5,7 @@ LABEL maintainer="eric <ericwang2006@gmail.com>"
 ENV TZ=Asia/Shanghai
 ENV LANG C.UTF-8
 
-COPY crash_monitor.sh crontab_list.sh start.sh qr.sh ttnode /usr/node/
+COPY crash_monitor.sh crontab_list.sh start.sh qr.sh port.sh ttnode /usr/node/
 
 # cron模式
 # RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
