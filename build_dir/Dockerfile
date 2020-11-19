@@ -26,7 +26,7 @@ COPY crash_monitor.sh crontab_list.sh start.sh qr.sh ttnode /usr/node/
 # start.sh用脚本监控ttnode进程,不用cron
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    apt-get update && apt-get install procps net-tools iputils-ping wget nano -y --no-install-recommends && \
+    apt-get update && apt-get install procps net-tools iputils-ping iperf3 wget nano -y --no-install-recommends && \
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
     apt-get clean && \
     apt-get purge -y --auto-remove
