@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/docker/stars/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/pulls/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/image-size/ericwang2006/ttnode/latest"/>
+
 # 甜糖星愿镜像
 
 - 基于debian:stable-slim构建
