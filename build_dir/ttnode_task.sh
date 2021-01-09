@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 function create_config_file() {
 	if [ ! -f "$1" ]; then
 		echo '{}' >$1

@@ -5,7 +5,7 @@ LABEL maintainer="eric <ericwang2006@gmail.com>"
 ENV TZ=Asia/Shanghai
 ENV LANG C.UTF-8
 
-COPY crash_monitor.sh crontab_list.sh start.sh qr.sh port.sh /usr/node/
+COPY crash_monitor.sh ttnode_task.sh crontab_list.sh start.sh qr.sh port.sh /usr/node/
 
 # cron模式
 # RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
@@ -26,10 +26,13 @@ COPY crash_monitor.sh crontab_list.sh start.sh qr.sh port.sh /usr/node/
 # start.sh用脚本监控ttnode进程,不用cron
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    apt-get update && apt-get install procps net-tools iputils-ping iperf3 wget nano -y --no-install-recommends && \
-    wget --no-check-certificate -qO /usr/node/ttnode https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/`uname -m`/ttnode && \
+    apt-get update && apt-get install cron procps net-tools iputils-ping ca-certificates curl jq nano -y --no-install-recommends && \
+    curl -k -o /usr/node/ttnode https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/`uname -m`/ttnode && \
     chmod 755 /usr/node/ttnode && \
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
     apt-get clean && \
     apt-get purge -y --auto-remove
+
+WORKDIR /usr/node
+
 CMD ["/usr/node/start.sh"]
