@@ -6,6 +6,7 @@
 - 去除了crontab任务，改用脚本监控ttndoe进程
 - docker日志中直接查询UID
 - docker日志中直接查看UPNP端口号
+- 自动收取星愿，基于Shell脚本，参见[自动收取星愿配置说明](AutoNode.md)
 - 完全开源
 
 # 食用方法

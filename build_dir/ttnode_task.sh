@@ -246,6 +246,7 @@ report() {
 }
 
 update() {
+	sleep300
 	tmpfile="/tmp/.ttnode_task.sh"
 	echo "开始升级..." && curl -s -o "$tmpfile" https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/build_dir/ttnode_task.sh && cp "$0" "$0.bak" && mv "$tmpfile" $0 && chmod +x $0 && echo "升级成功"
 }
