@@ -19,11 +19,11 @@ function create_config_file() {
 function login() {
 	read -p "请输入手机号码：" tel
 	if [ ${#tel} = 11 ]; then
-		codeText=$(curl -s -X POST http://tiantang.mogencloud.com/web/api/login/code?phone=$tel | jq '.errCode')
+		codeText=$(curl -s -X POST https://tiantang.mogencloud.com/web/api/login/code?phone=$tel | jq '.errCode')
 		if [ $codeText = 0 ]; then
 			read -p "验证码发送成功，请输入：" code
 			if [ ${#code} = 6 ]; then
-				tokenText=$(curl -s -X POST http://tiantang.mogencloud.com/web/api/login?phone=$tel\&authCode=$code | jq -r '.data.token')
+				tokenText=$(curl -s -X POST https://tiantang.mogencloud.com/web/api/login?phone=$tel\&authCode=$code | jq -r '.data.token')
 				if [ $tokenText = null ]; then
 					echo "登录失败，请重试！"
 				else
@@ -82,7 +82,7 @@ withdraw() {
 		exit 2
 	fi
 	sleep300
-	text=$(curl -X POST -H "authorization:$token" -s http://tiantang.mogencloud.com/web/api/account/message/loading)
+	text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
@@ -111,7 +111,7 @@ withdraw() {
 			--data-urlencode "bank_name=$bank_name" \
 			--data-urlencode "sub_bank_name=$sub_bank_name" \
 			--data-urlencode "type=$type" \
-			"http://tiantang.mogencloud.com/api/v1/withdraw_logs")
+			"https://tiantang.mogencloud.com/api/v1/withdraw_logs")
 		errCode=$(echo $text | jq '.errCode')
 		d=$(date "+%Y-%m-%d %H:%M:%S")
 		if [[ $errCode -eq 0 ]]; then
@@ -189,7 +189,7 @@ report() {
 		exit 2
 	fi
 	sleep300
-	text=$(curl -X POST -H "authorization:$token" -s http://tiantang.mogencloud.com/web/api/account/message/loading)
+	text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
@@ -208,10 +208,10 @@ report() {
 	echo "今日推广星愿：*$inactivedPromoteScore*" >>$mfile
 	total=$((total + inactivedPromoteScore))
 	if [[ $inactivedPromoteScore -gt 0 ]]; then
-		curl -X POST -H "authorization:$token" -s "http://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore" >/dev/null 2>&1
+		curl -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore" >/dev/null 2>&1
 	fi
 	#签到
-	sign_result=$(curl -s -X POST -H "authorization:$token" -s http://tiantang.mogencloud.com/web/api/account/sign_in)
+	sign_result=$(curl -s -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/sign_in)
 	sign_errCode=$(echo $sign_result | jq '.errCode')
 	sign_msg=$(echo $sign_result | jq -r '.msg')
 	sign_data=$(echo $sign_result | jq -r '.data')
@@ -223,7 +223,7 @@ report() {
 	fi
 
 	echo "设备星愿详情：" >>$mfile
-	text=$(curl -s -X GET -H "authorization:$token" -s "http://tiantang.mogencloud.com/api/v1/devices?page=1&type=2&per_page=64")
+	text=$(curl -s -X GET -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/devices?page=1&type=2&per_page=64")
 	devList=$(echo $text | jq '.data.data')
 	max_device_index=$(echo $text | jq '.data.data|length'-1)
 	for index in $(seq 0 $max_device_index); do
@@ -231,7 +231,7 @@ report() {
 		alias=$(echo $devList | jq -r ".[$index].alias")
 		devSore=$(echo $devList | jq ".[$index].inactived_score")
 		if [[ $devSore -gt 0 ]]; then
-			curl -s -X POST -H "authorization:$token" -s "http://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore" >/dev/null 2>&1
+			curl -s -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore" >/dev/null 2>&1
 			total=$((total + devSore))
 		fi
 		echo "【$alias】星愿：*$devSore*" >>$mfile
