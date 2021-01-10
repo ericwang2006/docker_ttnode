@@ -30,6 +30,8 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     curl -k -o /usr/node/ttnode https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/`uname -m`/ttnode && \
     chmod 755 /usr/node/ttnode && \
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
+	ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+	echo 'Asia/Shanghai' >/etc/timezone && \
     apt-get clean && \
     apt-get purge -y --auto-remove
 

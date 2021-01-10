@@ -1,4 +1,15 @@
 #!/bin/bash
+function sleep300() {
+	seconds_left=$((RANDOM % 300 + 1))
+	echo "错峰延时执行$seconds_left秒，请耐心等待"
+	while [ $seconds_left -gt 0 ]; do
+		echo -n $seconds_left
+		sleep 1
+		seconds_left=$(($seconds_left - 1))
+		echo -ne "\r     \r"
+	done
+}
+
 function create_config_file() {
 	if [ ! -f "$1" ]; then
 		echo '{}' >$1
@@ -57,7 +68,7 @@ Options:
 escape() {
 	# https://core.telegram.org/bots/api#markdown-style
 	# To escape characters '_', '*', '`', '[' outside of an entity, prepend the characters '\' before them.
-	echo "$1" | sed 's/\_/\\\_/g' | sed 's/\*/\\\*/g' | sed 's/\`/\\\`/g' | sed 's/\[/\\\[/g'
+	echo "$1" | sed 's/\_/\\\_/g' | sed 's/\*/\\\*/g' | sed 's/`/\\\`/g' | sed 's/\[/\\\[/g'
 }
 
 withdraw() {
@@ -70,6 +81,7 @@ withdraw() {
 	if [ "$token" = "null" ]; then
 		exit 2
 	fi
+	sleep300
 	text=$(curl -X POST -H "authorization:$token" -s http://tiantang.mogencloud.com/web/api/account/message/loading)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ $errCode -ne 0 ]]; then
@@ -176,6 +188,7 @@ report() {
 	if [ "$token" = "null" ]; then
 		exit 2
 	fi
+	sleep300
 	text=$(curl -X POST -H "authorization:$token" -s http://tiantang.mogencloud.com/web/api/account/message/loading)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ $errCode -ne 0 ]]; then
@@ -195,7 +208,7 @@ report() {
 	echo "今日推广星愿：*$inactivedPromoteScore*" >>$mfile
 	total=$((total + inactivedPromoteScore))
 	if [[ $inactivedPromoteScore -gt 0 ]]; then
-		curl -X POST -H "authorization:$token" -s "http://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore"
+		curl -X POST -H "authorization:$token" -s "http://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore" >/dev/null 2>&1
 	fi
 	#签到
 	sign_result=$(curl -s -X POST -H "authorization:$token" -s http://tiantang.mogencloud.com/web/api/account/sign_in)
@@ -218,7 +231,7 @@ report() {
 		alias=$(echo $devList | jq -r ".[$index].alias")
 		devSore=$(echo $devList | jq ".[$index].inactived_score")
 		if [[ $devSore -gt 0 ]]; then
-			curl -s -X POST -H "authorization:$token" -s "http://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore"
+			curl -s -X POST -H "authorization:$token" -s "http://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore" >/dev/null 2>&1
 			total=$((total + devSore))
 		fi
 		echo "【$alias】星愿：*$devSore*" >>$mfile
