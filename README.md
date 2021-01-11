@@ -3,6 +3,7 @@
 # 甜糖星愿镜像
 
 - 基于debian:stable-slim构建
+- 多架构支持,目前支持linux/amd64,linux/arm/v7,linux/arm64(其中amd64镜像内部使用QEMU模拟arm64)
 - 去除了crontab任务，改用脚本监控ttndoe进程
 - docker日志中直接查询UID
 - docker日志中直接查看UPNP端口号
@@ -11,7 +12,8 @@
 
 # 食用方法
 
-如果是arm架构（例如N1盒子），可直接使用，如果是x86平台，是不支持arm架构镜像，因此我们可以运行一个新的容器让其支持该特性。
+~~如果是arm架构（例如N1盒子），可直接使用，如果是x86平台，是不支持arm架构镜像，因此我们可以运行一个新的容器让其支持该特性。~~
+已经实现多架构自适应，这步可以省略了。以后只要无脑`docker pull ericwang2006/ttnode`，就是这么方便。
 
 ```
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
