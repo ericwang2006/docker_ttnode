@@ -102,6 +102,9 @@ withdraw() {
 		d=$(date "+%Y-%m-%d %H:%M:%S")
 		m=$(echo -e "$d\n甜糖提现失败：星愿不足1000")
 	else
+		if [[ $score -gt 10000 ]]; then
+			score=10000
+		fi
 		text=$(curl -s -X POST \
 			-H "authorization:$token" \
 			-H "Content-Type:application/x-www-form-urlencoded" \
