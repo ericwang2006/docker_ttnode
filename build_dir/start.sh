@@ -9,7 +9,22 @@ while true; do
 	if [ $num -lt 1 ]; then
 		d=$(date '+%F %T')
 		echo "[$d] ttnode进程不存在,启动ttnode"
-		/usr/node/ttnode -p /mnts
+		case "$(uname -m)" in
+		x86_64)
+			qemu="/usr/bin/qemu-arm-static"
+			;;
+		aarch64)
+			qemu=""
+			;;
+		armv7l)
+			qemu=""
+			;;
+		*)
+			echo "不支持的处理器平台!!!"
+			exit 1
+			;;
+		esac
+		$qemu /usr/node/ttnode -p /mnts
 		/usr/node/qr.sh
 
 		# sleep 20
