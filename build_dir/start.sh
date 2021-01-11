@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ $DISABLE_ATUO_TASK != "1" ]; then
+if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 	service cron start
 	crontab /usr/node/crontab_list.sh
 fi
