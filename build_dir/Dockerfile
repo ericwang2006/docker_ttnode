@@ -5,8 +5,6 @@ LABEL maintainer="eric <ericwang2006@gmail.com>"
 ENV TZ=Asia/Shanghai
 ENV LANG C.UTF-8
 
-COPY crash_monitor.sh ttnode_task.sh crontab_list.sh start.sh qr.sh port.sh init_arch.sh /usr/node/
-
 # cron模式
 # RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     # sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
@@ -32,6 +30,8 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
 	echo 'Asia/Shanghai' >/etc/timezone && \
     apt-get clean && \
     apt-get purge -y --auto-remove
+
+COPY crash_monitor.sh ttnode_task.sh crontab_list.sh start.sh qr.sh port.sh init_arch.sh /usr/node/
 
 RUN /usr/node/init_arch.sh
 
