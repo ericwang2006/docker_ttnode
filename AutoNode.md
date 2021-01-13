@@ -8,7 +8,7 @@
 	- 其他Linux系统请自行查找对应发行版的安装方法，也可以从[这里](https://github.com/stedolan/jq/releases)直接下载对应的二进制文件，并复制到/usr/bin目录
 	- docker镜像ericwang2006/ttnode自带运行环境，只需更新到最新版本镜像
 2. 设置定时任务
-	- docker版需要进入容器`docker exec -it ttnode /bin/bash` ，修改/usr/node/crontab_list.sh文件，以下内容供参考，修改后需重启容器。
+	- docker版需要进入容器`docker exec -it ttnode /bin/bash` ，修改/config/crontab_list.sh文件，以下内容供参考，修改后需重启容器。
 	```
 	#自动更新
 	0 0 * * *  /usr/node/ttnode_task.sh update
@@ -34,7 +34,7 @@
 		- 提示"登录成功,是否继续配置通知参数? [Y/n] "，可直接按回车继续配置通知参数，如果徐需要通知可以直接选n。
 		- 如果以后需要继续配置通知，可以重新执行`/usr/node/ttnode_task.sh config_notify`
 		- 目前通知支持Server酱和tg，可以根据自己情况配置
-		- 配置文件存放在/usr/node/config.json,也可以直接修改配置文件
+		- 配置文件存放在/config/config.json,也可以直接修改配置文件
 			```
 			{
 			  "token": "token"
@@ -44,6 +44,18 @@
 			  "tg_proxy": "http://192.168.0.1:3128"
 			}
 			```
-	- 下面就可以坐享其成了
+	- 备份配置
+		建议创建容器时把容器内/config目录映射到本机目录，以下代码仅供参考。
+		```
+		docker run -itd \
+		  -v /mnt/data/ttnode:/mnts \
+		  -v ~/config:/config \
+		  --name ttnode \
+		  --net=host \
+		  --privileged=true \
+		  --restart=always \
+		  ericwang2006/ttnode
+		```
 3. 已知问题
+
 	目前只支持收款的支付宝，最大收款金额100元，最多收款设备64台
