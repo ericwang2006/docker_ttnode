@@ -1,7 +1,28 @@
 #!/bin/bash
+CONFIG_DIR="/config"
+
+function move_config() {
+	mkdir -p "$CONFIG_DIR"
+	OLD_DIR=$(dirname $0)
+	f="crontab_list.sh"
+	if [ -f "$OLD_DIR/$f" ]; then
+		if [ ! -f "$CONFIG_DIR/$f" ]; then
+			cp "$OLD_DIR/$f" "$CONFIG_DIR/$f"
+		fi
+		mv "$OLD_DIR/$f" "$OLD_DIR/$f.bak"
+		echo "迁移$OLD_DIR/$f到$CONFIG_DIR/$f"
+	fi
+}
+
 if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 	service cron start
-	crontab /usr/node/crontab_list.sh
+	move_config
+	if [ ! -f "$CONFIG_DIR/crontab_list.sh" ]; then
+		echo '0 0 * * *  /usr/node/ttnode_task.sh update' >$CONFIG_DIR/crontab_list.sh
+		echo '8 4 * * *  /usr/node/ttnode_task.sh report' >>$CONFIG_DIR/crontab_list.sh
+		echo '15 4 * * 3 /usr/node/ttnode_task.sh withdraw' >>$CONFIG_DIR/crontab_list.sh
+	fi
+	crontab $CONFIG_DIR/crontab_list.sh
 fi
 
 foundport=0

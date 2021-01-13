@@ -1,4 +1,7 @@
 #!/bin/bash
+
+CONFIG_DIR="/config"
+
 function sleep300() {
 	seconds_left=$((RANDOM % 300 + 1))
 	echo "错峰延时执行$seconds_left秒，请耐心等待"
@@ -8,6 +11,19 @@ function sleep300() {
 		seconds_left=$(($seconds_left - 1))
 		echo -ne "\r     \r"
 	done
+}
+
+function move_config() {
+	mkdir -p "$CONFIG_DIR"
+	OLD_DIR=$(dirname $0)
+	f="config.json"
+	if [ -f "$OLD_DIR/$f" ]; then
+		if [ ! -f "$CONFIG_DIR/$f" ]; then
+			cp "$OLD_DIR/$f" "$CONFIG_DIR/$f"
+		fi
+		mv "$OLD_DIR/$f" "$OLD_DIR/$f.bak"
+		echo "迁移$OLD_DIR/$f到$CONFIG_DIR/$f"
+	fi
 }
 
 function create_config_file() {
@@ -27,8 +43,8 @@ function login() {
 				if [ $tokenText = null ]; then
 					echo "登录失败，请重试！"
 				else
-					cfile="$(dirname $0)/config.json"
-					tfile="$(dirname $0)/.config.json"
+					cfile="$CONFIG_DIR/config.json"
+					tfile="$CONFIG_DIR/.config.json"
 					create_config_file $cfile
 					jq ".+{\"token\":\"$tokenText\"}" $cfile >$tfile && mv $tfile $cfile
 					read -r -p "登录成功,是否继续配置通知参数? [Y/n] " input
@@ -72,8 +88,8 @@ escape() {
 }
 
 withdraw() {
-	cfile="$(dirname $0)/config.json"
-	mfile="$(dirname $0)/msg.txt"
+	cfile="$CONFIG_DIR/config.json"
+	mfile="$CONFIG_DIR/msg.txt"
 	if [ ! -f "$cfile" ]; then
 		exit 1
 	fi
@@ -128,7 +144,7 @@ withdraw() {
 }
 
 notify() {
-	cfile="$(dirname $0)/config.json"
+	cfile="$CONFIG_DIR/config.json"
 	# Server酱通知
 	sckey=$(jq -r '.sckey' $cfile)
 	if [ -n "$sckey" ]; then
@@ -153,8 +169,8 @@ notify() {
 }
 
 config_notify() {
-	cfile="$(dirname $0)/config.json"
-	tfile="$(dirname $0)/.config.json"
+	cfile="$CONFIG_DIR/config.json"
+	tfile="$CONFIG_DIR/.config.json"
 	create_config_file $cfile
 
 	read -p "请输入Server酱的SCKEY,不使用Server酱通知直接按回车：" sckey
@@ -182,8 +198,8 @@ config_notify() {
 
 report() {
 	total=0
-	cfile="$(dirname $0)/config.json"
-	mfile="$(dirname $0)/msg.txt"
+	cfile="$CONFIG_DIR/config.json"
+	mfile="$CONFIG_DIR/msg.txt"
 	if [ ! -f "$cfile" ]; then
 		exit 1
 	fi
@@ -259,15 +275,19 @@ main() {
 	[ -z "${action}" ] && show_help && exit 0
 	case "${action}" in
 	login)
+		move_config
 		login
 		;;
 	config_notify)
+		move_config
 		config_notify
 		;;
 	report)
+		move_config
 		report
 		;;
 	withdraw)
+		move_config
 		withdraw
 		;;
 	update)

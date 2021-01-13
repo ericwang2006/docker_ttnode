@@ -31,10 +31,12 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     apt-get clean && \
     apt-get purge -y --auto-remove
 
-COPY ttnode_task.sh crontab_list.sh start.sh qr.sh port.sh init_arch.sh /usr/node/
+COPY ttnode_task.sh start.sh qr.sh port.sh init_arch.sh /usr/node/
 
 RUN /usr/node/init_arch.sh && rm /usr/node/init_arch.sh
 
 WORKDIR /usr/node
+
+VOLUME ["/config"]
 
 CMD ["/usr/node/start.sh"]
