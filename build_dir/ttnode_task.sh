@@ -1,6 +1,10 @@
 #!/bin/bash
 
-CONFIG_DIR="/config"
+if [ -f "/.dockerenv" ]; then
+	CONFIG_DIR="/config"
+else
+	CONFIG_DIR=$(dirname $0)
+fi
 
 function sleep300() {
 	seconds_left=$((RANDOM % 300 + 1))
@@ -14,15 +18,17 @@ function sleep300() {
 }
 
 function move_config() {
-	mkdir -p "$CONFIG_DIR"
 	OLD_DIR=$(dirname $0)
-	f="config.json"
-	if [ -f "$OLD_DIR/$f" ]; then
-		if [ ! -f "$CONFIG_DIR/$f" ]; then
-			cp "$OLD_DIR/$f" "$CONFIG_DIR/$f"
+	if [[ $OLD_DIR != $CONFIG_DIR ]]; then
+		mkdir -p "$CONFIG_DIR"
+		f="config.json"
+		if [ -f "$OLD_DIR/$f" ]; then
+			if [ ! -f "$CONFIG_DIR/$f" ]; then
+				cp "$OLD_DIR/$f" "$CONFIG_DIR/$f"
+			fi
+			mv "$OLD_DIR/$f" "$OLD_DIR/$f.bak"
+			echo "迁移$OLD_DIR/$f到$CONFIG_DIR/$f"
 		fi
-		mv "$OLD_DIR/$f" "$OLD_DIR/$f.bak"
-		echo "迁移$OLD_DIR/$f到$CONFIG_DIR/$f"
 	fi
 }
 
