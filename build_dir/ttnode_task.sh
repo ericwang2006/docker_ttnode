@@ -267,7 +267,7 @@ report() {
 	echo "注意:以上统计仅供参考，一切请以甜糖客户端APP为准" >>$mfile
 	echo "如果觉得还有点用，麻烦用一下我的邀请码*631441*，有加成卡15张，我也有推广收入" >>$mfile
 	notify "$(cat $mfile)"
-	cat msg.txt | sed 's/\*//g'
+	cat $mfile | sed 's/\*//g'
 }
 
 update() {
