@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ttnode_filename="ttnode_181"
 case "$(uname -m)" in
 x86_64)
 	dpkg --add-architecture arm64
@@ -11,13 +11,13 @@ x86_64)
 	qemu="/usr/bin/qemu-arm-static"
 	curl -L -o $qemu https://github.com/multiarch/qemu-user-static/releases/download/v5.2.0-2/qemu-aarch64-static && chmod +x $qemu
 	# curl -k -o /usr/node/ttnode https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/$(uname -m)/ttnode
-	curl -L -k -o /usr/node/ttnode http://o7coj731m.bkt.clouddn.com/tiantang/arm64/ttnode_177 && chmod +x /usr/node/ttnode
+	curl -L -k -o /usr/node/ttnode http://o7coj731m.bkt.clouddn.com/tiantang/arm64/$ttnode_filename && chmod +x /usr/node/ttnode
 	;;
 aarch64)
-	curl -L -k -o /usr/node/ttnode http://o7coj731m.bkt.clouddn.com/tiantang/arm64/ttnode_177 && chmod +x /usr/node/ttnode
+	curl -L -k -o /usr/node/ttnode http://o7coj731m.bkt.clouddn.com/tiantang/arm64/$ttnode_filename && chmod +x /usr/node/ttnode
 	;;
 armv7l)
-	curl -L -k -o /usr/node/ttnode http://o7coj731m.bkt.clouddn.com/tiantang/arm32/ttnode_177 && chmod +x /usr/node/ttnode
+	curl -L -k -o /usr/node/ttnode http://o7coj731m.bkt.clouddn.com/tiantang/arm32/$ttnode_filename && chmod +x /usr/node/ttnode
 	;;
 *)
 	echo "不支持的处理器平台!!!"
