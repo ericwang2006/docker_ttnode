@@ -20,6 +20,18 @@ function move_config() {
 	fi
 }
 
+maskdigits() {
+	a=$(echo "$1" | awk -F "." '{print $1" "$2" "$3" "$4}')
+	for num in $a; do
+		while [ $num != 0 ]; do
+			echo -n $(($num % 2)) >>/tmp/num
+			num=$(($num / 2))
+		done
+	done
+	echo $(grep -o "1" /tmp/num | wc -l)
+	rm /tmp/num
+}
+
 if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 	service cron start
 	move_config
@@ -74,6 +86,37 @@ while true; do
 			echo "[$d] 如果UPNP失效，请在路由器上对下列端口做转发"
 			cat /usr/node/port.txt | awk '{print $1,$2" "}'
 			# awk '{x[$2]=x[$2]" "$1} END {for(i in x){print i x[i]}}' /usr/node/port.txt |awk '{print $2","$3,$1" "}'|sed 's/, / /'
+
+			lan_dev="eth0"
+			lan_ip=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $3}')
+			lan_mask=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $5}')
+
+			echo "# 如果路由器支持自定义防火墙,可以用以下命令代替端口转发设置"
+			echo "# 此功能为实验性质,仅供高级用户使用"
+			echo "# 以下shell命令仅供参考,需要根据路由器实际情况修改"
+			echo "# 需要特别注意iptables防火墙规则的顺序非常关键,要合理安排执行顺序"
+			echo -e "wan_dev='pppoe-wan' # 外网设备名\n"
+			while read line; do
+				protocol=$(echo $line | cut -d ' ' -f 1)
+				port=$(echo $line | cut -d ' ' -f 2)
+				echo "iptables -t nat -A PREROUTING -i \$wan_dev -p $protocol -m $protocol --dport $port -j DNAT --to-destination $lan_ip"
+				echo -e "iptables -A FORWARD -d $lan_ip/32 -i \$wan_dev -p $protocol -m $protocol --dport $port -j ACCEPT\n"
+			done </usr/node/port.txt
+
+			len=$(maskdigits "$lan_mask")
+			for i in $(seq 1 4); do
+				a=$(echo $lan_ip | cut -d '.' -f $i)
+				b=$(echo $lan_mask | cut -d '.' -f $i)
+				d=$((a & b))
+
+				if [ $i == 1 ]; then
+					ip="$d"
+				else
+					ip=$ip".$d"
+				fi
+			done
+
+			echo "iptables -t nat -A POSTROUTING -s $ip/$len -o \$wan_dev -j MASQUERADE"
 			echo "==========================================================================="
 			foundport=1
 			last=$(date +%s)
