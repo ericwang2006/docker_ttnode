@@ -1,5 +1,5 @@
 #!/bin/bash
-ttnode_filename="ttnode_181"
+# ttnode_filename="ttnode_181"
 case "$(uname -m)" in
 x86_64)
 	dpkg --add-architecture arm64
