@@ -1,6 +1,6 @@
-<!--<img src="https://img.shields.io/docker/stars/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/pulls/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/image-size/ericwang2006/ttnode/latest"/>-->
+<img src="https://img.shields.io/docker/stars/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/pulls/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/image-size/ericwang2006/ttnode/latest"/>
 
-[![nodesource/node](http://dockeri.co/image/ericwang2006/ttnode)](https://hub.docker.com/r/ericwang2006/ttnode/)
+<!--[![nodesource/node](http://dockeri.co/image/ericwang2006/ttnode)](https://hub.docker.com/r/ericwang2006/ttnode/)-->
 
 # 甜糖星愿镜像
 
