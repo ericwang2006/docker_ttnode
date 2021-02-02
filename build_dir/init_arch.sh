@@ -1,5 +1,4 @@
 #!/bin/bash
-# ttnode_filename="ttnode_181"
 case "$(uname -m)" in
 x86_64)
 	dpkg --add-architecture arm64
@@ -15,13 +14,13 @@ x86_64)
 	curl -L -k -o /usr/node/ttnode https://github.com/ericwang2006/docker_ttnode/raw/master/aarch64/ttnode && chmod +x /usr/node/ttnode
 	;;
 aarch64)
-	curl -L -k -o /usr/node/ttnode https://github.com/ericwang2006/docker_ttnode/raw/master/$(uname -m)/ttnode && chmod +x /usr/node/ttnode
+	curl -L -k -o /usr/node/ttnode https://github.com/ericwang2006/docker_ttnode/raw/master/aarch64/ttnode && chmod +x /usr/node/ttnode
 	;;
 armv7l)
-	curl -L -k -o /usr/node/ttnode https://github.com/ericwang2006/docker_ttnode/raw/master/$(uname -m)/ttnode && chmod +x /usr/node/ttnode
+	curl -L -k -o /usr/node/ttnode https://github.com/ericwang2006/docker_ttnode/raw/master/armv7l/ttnode && chmod +x /usr/node/ttnode
 	;;
 *)
-	echo "不支持的处理器平台!!!"
+	echo "unsupported CPU architecture!"
 	exit 1
 	;;
 esac

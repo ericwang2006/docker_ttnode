@@ -61,7 +61,7 @@ while true; do
 			qemu=""
 			;;
 		*)
-			echo "不支持的处理器平台!!!"
+			echo "unsupported CPU architecture!"
 			exit 1
 			;;
 		esac
@@ -82,6 +82,7 @@ while true; do
 		len=$(sed -n '$=' /usr/node/port.txt)
 		if [[ $len -gt 4 ]]; then
 			echo "==========================================================================="
+			echo $($qemu /usr/node/ttnode -h|head -n 1)
 			d=$(date '+%F %T')
 			echo "[$d] 如果UPNP失效，请在路由器上对下列端口做转发"
 			cat /usr/node/port.txt | awk '{print $1,$2" "}'
