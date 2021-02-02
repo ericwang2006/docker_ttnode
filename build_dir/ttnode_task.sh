@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# 本程序官方发布地址https://github.com/ericwang2006/docker_ttnode
+# 使用本程序前请先阅读说明文件https://github.com/ericwang2006/docker_ttnode/blob/master/AutoNode.md
+# 此说明文件是本程序不可分割的一部分，您一旦开始使用视为已同意里面的使用条款
+
 if [ -f "/.dockerenv" ]; then
 	CONFIG_DIR="/config"
 else
@@ -76,7 +80,7 @@ function login() {
 
 show_help() {
 	printf "
-Version: V0.01
+Version: V0.02
 Usage  : $0 [Options]
 Options:
         login               登录
@@ -125,7 +129,7 @@ withdraw() {
 		m=$(echo -e "$d\n甜糖提现失败：星愿不足1000")
 	else
 		if [[ $score -gt 10000 ]]; then
-			score=10000
+			score=9900
 		fi
 		text=$(curl -s -X POST \
 			-H "authorization:$token" \
