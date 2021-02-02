@@ -1,13 +1,16 @@
 # 自动收取星愿Shell脚本配置说明
 
-1. 运行环境 **curl ca-certificates jq**
+1. 使用条款
+	参见 [Readme.md](https://github.com/ericwang2006/docker_ttnode/blob/master/README.md)
+
+2. 运行环境 **curl ca-certificates jq**
 	- Debian/Ubuntu可以参考以下代码
 	`sudo apt-get update && sudo apt-get install curl ca-certificates jq -y --no-install-recommends`
 	- Centos/RedHat
 	`sudo yum install curl ca-certificates jq -y`
 	- 其他Linux系统请自行查找对应发行版的安装方法，也可以从[这里](https://github.com/stedolan/jq/releases)直接下载对应的二进制文件，并复制到/usr/bin目录
 	- docker镜像ericwang2006/ttnode自带运行环境，只需更新到最新版本镜像
-2. 设置定时任务
+3. 设置定时任务
 	- docker版需要进入容器`docker exec -it ttnode /bin/bash` ，修改/config/crontab_list.sh文件，以下内容供参考，修改后需重启容器。
 	```
 	#自动更新
@@ -18,7 +21,7 @@
 	15 4 * * 3 /usr/node/ttnode_task.sh withdraw
 	```
 	- Linux版本运行`crontab -e`，参考以上内容，自行编辑自动运行任务
-3. 配置
+4. 配置
 	- docker版直接进入容器
 		```
 		docker exec -it ttnode /bin/bash
@@ -56,6 +59,6 @@
 		  --restart=always \
 		  ericwang2006/ttnode
 		```
-3. 已知问题
+5. 已知问题
 
-	目前只支持收款的支付宝，最大收款金额100元，最多收款设备64台
+	目前只支持收款的支付宝，最大收款金额99元，最多收款设备64台
