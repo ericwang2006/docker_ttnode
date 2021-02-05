@@ -131,7 +131,8 @@ withdraw() {
 		if [[ $score -gt 10000 ]]; then
 			score=9900
 		fi
-		text=$(curl -s -X POST \
+		text=$(
+			curl -s -X POST \
 			-H "authorization:$token" \
 			-H "Content-Type:application/x-www-form-urlencoded" \
 			--data-urlencode "score=$score" \
@@ -140,7 +141,8 @@ withdraw() {
 			--data-urlencode "bank_name=$bank_name" \
 			--data-urlencode "sub_bank_name=$sub_bank_name" \
 			--data-urlencode "type=$type" \
-			"https://tiantang.mogencloud.com/api/v1/withdraw_logs")
+			"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+		)
 		errCode=$(echo $text | jq '.errCode')
 		d=$(date "+%Y-%m-%d %H:%M:%S")
 		if [[ $errCode -eq 0 ]]; then
