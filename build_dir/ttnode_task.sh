@@ -86,6 +86,7 @@ Options:
         login               登录
         config_notify       通知设置
         report              每日收取星愿
+        auto_turbo          自动使用加成卡
         withdraw            提现
 
 "
@@ -131,7 +132,8 @@ withdraw() {
 		if [[ $score -gt 10000 ]]; then
 			score=9900
 		fi
-		text=$(curl -s -X POST \
+		text=$(
+			curl -s -X POST \
 			-H "authorization:$token" \
 			-H "Content-Type:application/x-www-form-urlencoded" \
 			--data-urlencode "score=$score" \
@@ -140,7 +142,8 @@ withdraw() {
 			--data-urlencode "bank_name=$bank_name" \
 			--data-urlencode "sub_bank_name=$sub_bank_name" \
 			--data-urlencode "type=$type" \
-			"https://tiantang.mogencloud.com/api/v1/withdraw_logs")
+			"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+		)
 		errCode=$(echo $text | jq '.errCode')
 		d=$(date "+%Y-%m-%d %H:%M:%S")
 		if [[ $errCode -eq 0 ]]; then
@@ -274,6 +277,61 @@ report() {
 	cat $mfile | sed 's/\*//g'
 }
 
+auto_turbo() {
+	cfile="$CONFIG_DIR/config.json"
+	mfile="$CONFIG_DIR/msg.txt"
+	if [ ! -f "$cfile" ]; then
+		exit 1
+	fi
+	token=$(jq -r '.token' $cfile)
+	if [ "$token" = "null" ]; then
+		exit 2
+	fi
+	sleep300
+	# 获取加成卡信息
+	text=$(curl -X GET -H "authorization:$token" -s https://tiantang.mogencloud.com/api/v1/user_props)
+	errCode=$(echo $text | jq '.errCode')
+	if [[ $errCode -ne 0 ]]; then
+		msg="token可能失效，请尝试重新登录。"
+		notify "$msg"
+		echo "$msg"
+		exit 3
+	fi
+	echo "*$(date "+%Y-%m-%d %H:%M:%S")*" >$mfile
+	propsList=$(echo $text | jq '.data')
+	max_props_index=$(echo $text | jq '.data|length'-1)
+	current_id="unknown"
+	current_name="未使用卡"
+	current_rate="0"
+	for index in $(seq 0 $max_props_index); do
+		prop_id=$(echo $propsList | jq -r ".[$index].prop_id")
+		prop_name=$(echo $propsList | jq -r ".[$index].name")
+		prop_count=$(echo $propsList | jq -r ".[$index].count")
+		prop_rate=$(echo $propsList | jq -r ".[$index].config.earnings_rate")
+		echo "*发现 $prop_name ： $prop_count 张*" >>$mfile
+		# 方案1 使用 速率最高的 加速卡 此方案需要 apt install bc
+		# if [ "$prop_count" -gt "0" ] && [ $(echo "$prop_rate > $current_rate" | bc) -eq 1 ]; then
+		# 	current_id=$(echo $prop_id)
+		# 	current_name=$(echo $prop_name)
+		# 	current_rate=$(echo $prop_rate)
+		# fi
+		# 方案2 默认使用 只使用 ‘星愿加成卡’ 不知道那种方案更适合
+		if [ "$prop_count" -gt "0" ] && [ $prop_name == "星愿加成卡" ]; then
+			current_id=$(echo $prop_id)
+			current_name=$(echo $prop_name)
+		fi
+	done
+	# 使用 遍历出来的最高加速卡
+	if [ "$current_id" != "unknown" ]; then
+		curl -s -X PUT -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/user_props/$current_id/actived" >/dev/null 2>&1
+		echo "*已自动使用：$current_name*" >>$mfile
+	else
+		echo "*错误 ：$current_name*" >>$mfile
+	fi
+	notify "$(cat $mfile)"
+	cat $mfile | sed 's/\*//g'
+}
+
 update() {
 	sleep300
 	tmpfile="/tmp/.ttnode_task.sh"
@@ -295,6 +353,10 @@ main() {
 	report)
 		move_config
 		report
+		;;
+	auto_turbo)
+		move_config
+		auto_turbo
 		;;
 	withdraw)
 		move_config

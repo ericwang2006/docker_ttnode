@@ -37,6 +37,7 @@ if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 	move_config
 	if [ ! -f "$CONFIG_DIR/crontab_list.sh" ]; then
 		echo '0 0 * * *  /usr/node/ttnode_task.sh update' >$CONFIG_DIR/crontab_list.sh
+		echo '8 22 * * * /usr/node/ttnode_task.sh auto_turbo' >>$CONFIG_DIR/crontab_list.sh
 		echo '8 4 * * *  /usr/node/ttnode_task.sh report' >>$CONFIG_DIR/crontab_list.sh
 		echo '15 4 * * 3 /usr/node/ttnode_task.sh withdraw' >>$CONFIG_DIR/crontab_list.sh
 	fi
