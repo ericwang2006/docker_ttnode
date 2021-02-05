@@ -134,15 +134,15 @@ withdraw() {
 		fi
 		text=$(
 			curl -s -X POST \
-			-H "authorization:$token" \
-			-H "Content-Type:application/x-www-form-urlencoded" \
-			--data-urlencode "score=$score" \
-			--data-urlencode "real_name=$real_name" \
-			--data-urlencode "card_id=$card_id" \
-			--data-urlencode "bank_name=$bank_name" \
-			--data-urlencode "sub_bank_name=$sub_bank_name" \
-			--data-urlencode "type=$type" \
-			"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+				-H "authorization:$token" \
+				-H "Content-Type:application/x-www-form-urlencoded" \
+				--data-urlencode "score=$score" \
+				--data-urlencode "real_name=$real_name" \
+				--data-urlencode "card_id=$card_id" \
+				--data-urlencode "bank_name=$bank_name" \
+				--data-urlencode "sub_bank_name=$sub_bank_name" \
+				--data-urlencode "type=$type" \
+				"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
 		)
 		errCode=$(echo $text | jq '.errCode')
 		d=$(date "+%Y-%m-%d %H:%M:%S")
@@ -206,6 +206,17 @@ config_notify() {
 		jq 'del(.tg_api_key)' $cfile >$tfile && mv $tfile $cfile
 		jq 'del(.tg_chat_id)' $cfile >$tfile && mv $tfile $cfile
 		jq 'del(.tg_proxy)' $cfile >$tfile && mv $tfile $cfile
+	fi
+
+	read -p "请输入自动使用加成卡方案 1-使用速率最高的加成卡 2-只使用\"星愿加成卡\" ,不自动使用加成卡直接按回车：" auto_turbo
+	if [ -z "$auto_turbo" ]; then
+		jq 'del(.auto_turbo)' $cfile >$tfile && mv $tfile $cfile
+	else
+		if [ $auto_turbo == "1" -o $auto_turbo == "2" ]; then
+			jq ".+{\"auto_turbo\":$auto_turbo}" $cfile >$tfile && mv $tfile $cfile
+		else
+			jq 'del(.auto_turbo)' $cfile >$tfile && mv $tfile $cfile
+		fi
 	fi
 }
 
@@ -287,6 +298,11 @@ auto_turbo() {
 	if [ "$token" = "null" ]; then
 		exit 2
 	fi
+	auto_turbo=$(jq -r '.auto_turbo' $cfile)
+	if [ "$auto_turbo" = "null" ]; then
+		exit 0
+	fi
+
 	sleep300
 	# 获取加成卡信息
 	text=$(curl -X GET -H "authorization:$token" -s https://tiantang.mogencloud.com/api/v1/user_props)
@@ -309,16 +325,19 @@ auto_turbo() {
 		prop_count=$(echo $propsList | jq -r ".[$index].count")
 		prop_rate=$(echo $propsList | jq -r ".[$index].config.earnings_rate")
 		echo "*发现 $prop_name ： $prop_count 张*" >>$mfile
-		# 方案1 使用 速率最高的 加速卡 此方案需要 apt install bc
-		# if [ "$prop_count" -gt "0" ] && [ $(echo "$prop_rate > $current_rate" | bc) -eq 1 ]; then
-		# 	current_id=$(echo $prop_id)
-		# 	current_name=$(echo $prop_name)
-		# 	current_rate=$(echo $prop_rate)
-		# fi
-		# 方案2 默认使用 只使用 ‘星愿加成卡’ 不知道那种方案更适合
-		if [ "$prop_count" -gt "0" ] && [ $prop_name == "星愿加成卡" ]; then
-			current_id=$(echo $prop_id)
-			current_name=$(echo $prop_name)
+		if [ $auto_turbo == "1" ]; then
+			# 方案1 使用 速率最高的 加速卡 此方案需要 apt install bc
+			if [ "$prop_count" -gt "0" ] && [ $(echo "$prop_rate > $current_rate" | bc) -eq 1 ]; then
+				current_id=$(echo $prop_id)
+				current_name=$(echo $prop_name)
+				current_rate=$(echo $prop_rate)
+			fi
+		else
+			# 方案2 默认使用 只使用 ‘星愿加成卡’ 不知道那种方案更适合
+			if [ "$prop_count" -gt "0" ] && [ $prop_name == "星愿加成卡" ]; then
+				current_id=$(echo $prop_id)
+				current_name=$(echo $prop_name)
+			fi
 		fi
 	done
 	# 使用 遍历出来的最高加速卡
