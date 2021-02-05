@@ -86,7 +86,7 @@ Options:
         login               登录
         config_notify       通知设置
         report              每日收取星愿
-		auto_turbo          自动使用加成卡
+        auto_turbo          自动使用加成卡
         withdraw            提现
 
 "
