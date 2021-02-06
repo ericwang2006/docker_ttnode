@@ -15,8 +15,8 @@
 	```
 	#自动更新
 	0 0 * * *  /usr/node/ttnode_task.sh update
-	#每日22点8分自动使用 加成卡
-	8 22 * * *  /usr/node/ttnode_task.sh auto_turbo
+	#每日20点8分自动使用 加成卡
+	8 20 * * *  /usr/node/ttnode_task.sh auto_turbo
 	#每日自动收取星愿
 	8 4 * * *  /usr/node/ttnode_task.sh report
 	#每周三自动提现
