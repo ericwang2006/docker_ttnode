@@ -11,6 +11,7 @@
 - docker日志中直接查看UPNP端口号
 - 显示可替代端口转发的iptables命令(仅供高级用户使用)
 - 自动收取星愿，基于Shell脚本，参见[自动收取星愿配置说明](AutoNode.md)（SHELL脚本参考了yjce1314大神的[代码](https://www.right.com.cn/forum/thread-4065542-1-1.html)）
+- 自动使用加成卡功能，感谢[houfukude](https://github.com/houfukude)
 - 完全开源
 
 # 使用条款

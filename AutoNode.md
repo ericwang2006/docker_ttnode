@@ -37,6 +37,7 @@
 	- 以下操作docker版本和linxu版本相同
 		- 执行`/usr/node/ttnode_task.sh login`，根据提示输入手机号码和验证码登录
 		- 提示"登录成功,是否继续配置通知参数? [Y/n] "，可直接按回车继续配置通知参数，如果徐需要通知可以直接选n。
+		- 提示"选择自动使用加成卡方案"，1-使用速率最高的加成卡 2-只使用"星愿加成卡"，如果输入其他内容不自动使用加成卡。
 		- 如果以后需要继续配置通知，可以重新执行`/usr/node/ttnode_task.sh config_notify`
 		- 目前通知支持Server酱和tg，可以根据自己情况配置
 		- 配置文件存放在/config/config.json,也可以直接修改配置文件
@@ -46,7 +47,8 @@
 			  "sckey": "SCU5698Tbe90d0c286dba9fac97c25352211d3658f20e3e9c585",
 			  "tg_api_key": "15692865:AAFnsuBwkD_8Ft-L5527HYF8uPs86ZtQjjs",
 			  "tg_chat_id": "55225892",
-			  "tg_proxy": "http://192.168.0.1:3128"
+			  "tg_proxy": "http://192.168.0.1:3128",
+			  "auto_turbo": 0
 			}
 			```
 	- 备份配置
