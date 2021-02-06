@@ -122,4 +122,6 @@ docker logs ttnode
 [2020-11-18 10:25:34] ttnode启动失败,再来一次,
 /bin/sh: 1: cannot create /proc/sys/net/core/wmem_max: Directory nonexistent,
 ```
+- 重新创建容器，即使是同样的IP和mac地址，也会导致ttnode的uid变化
+
 #### 如果觉得还有点用，麻烦用一下我的邀请码631441，有加成卡15张，我也有推广收入
