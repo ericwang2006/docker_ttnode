@@ -134,15 +134,15 @@ withdraw() {
 		fi
 		text=$(
 			curl -s -X POST \
-				-H "authorization:$token" \
-				-H "Content-Type:application/x-www-form-urlencoded" \
-				--data-urlencode "score=$score" \
-				--data-urlencode "real_name=$real_name" \
-				--data-urlencode "card_id=$card_id" \
-				--data-urlencode "bank_name=$bank_name" \
-				--data-urlencode "sub_bank_name=$sub_bank_name" \
-				--data-urlencode "type=$type" \
-				"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+			-H "authorization:$token" \
+			-H "Content-Type:application/x-www-form-urlencoded" \
+			--data-urlencode "score=$score" \
+			--data-urlencode "real_name=$real_name" \
+			--data-urlencode "card_id=$card_id" \
+			--data-urlencode "bank_name=$bank_name" \
+			--data-urlencode "sub_bank_name=$sub_bank_name" \
+			--data-urlencode "type=$type" \
+			"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
 		)
 		errCode=$(echo $text | jq '.errCode')
 		d=$(date "+%Y-%m-%d %H:%M:%S")
@@ -299,7 +299,8 @@ auto_turbo() {
 		exit 2
 	fi
 	auto_turbo=$(jq -r '.auto_turbo' $cfile)
-	if [ "$auto_turbo" = "null" ]; then
+	# 为0 或者为 null 都不执行
+	if [ "$auto_turbo" = "null" ] || [ "$auto_turbo" = "0" ]; then
 		exit 0
 	fi
 
