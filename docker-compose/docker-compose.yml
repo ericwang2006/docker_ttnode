@@ -2,7 +2,11 @@ version: '2'
 
 services:     
   ttnode:
+    # 测试用
+    # image: ericwang2006/ttnode:test
     image: ericwang2006/ttnode
+    # 内存限制
+    mem_limit: 1024m
     container_name: ttnode
     privileged: true
     restart: always
@@ -12,6 +16,8 @@ services:
       macvlan:
         ipv4_address: 192.168.2.2
     volumes:
+      # issues#16 提到的 配置文件
+      - ./config:/config
       - /mnt/data/ttnode:/mnts
 
 networks:
