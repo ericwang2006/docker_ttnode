@@ -1,4 +1,18 @@
-FROM debian:stable-slim
+FROM --platform=$TARGETPLATFORM debian:stable-slim AS builder
+
+RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    apt-get update && \
+	apt-get install build-essential git ca-certificates wget -y --no-install-recommends
+	
+# http://www.acme.com/software/thttpd/
+RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
+    tar -zxvf ./thttpd-2.29.tar.gz && \
+    cd thttpd-2.29 && \
+    ./configure && \
+    make
+
+FROM --platform=$TARGETPLATFORM debian:stable-slim
 
 LABEL maintainer="eric <ericwang2006@gmail.com>"
 
@@ -32,6 +46,9 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     apt-get purge -y --auto-remove
 
 COPY ttnode_task.sh start.sh qr.sh port.sh init_arch.sh /usr/node/
+
+COPY --from=builder /thttpd-2.29/thttpd /usr/node/
+COPY htdocs /usr/node/htdocs/
 
 RUN /usr/node/init_arch.sh && rm /usr/node/init_arch.sh
 

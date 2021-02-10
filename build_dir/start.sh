@@ -44,6 +44,8 @@ if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 	crontab $CONFIG_DIR/crontab_list.sh
 fi
 
+/usr/node/thttpd -u root -p 1043 -d /usr/node/htdocs -c "**.cgi"
+
 foundport=0
 last=$(date +%s)
 while true; do
@@ -83,7 +85,7 @@ while true; do
 		len=$(sed -n '$=' /usr/node/port.txt)
 		if [[ $len -gt 4 ]]; then
 			echo "==========================================================================="
-			echo $($qemu /usr/node/ttnode -h|head -n 1)
+			echo $($qemu /usr/node/ttnode -h | head -n 1)
 			d=$(date '+%F %T')
 			echo "[$d] 如果UPNP失效，请在路由器上对下列端口做转发"
 			cat /usr/node/port.txt | awk '{print $1,$2" "}'
@@ -93,16 +95,18 @@ while true; do
 			lan_ip=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $3}')
 			lan_mask=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $5}')
 
-			echo "# 如果路由器支持自定义防火墙,可以用以下命令代替端口转发设置"
-			echo "# 此功能为实验性质,仅供高级用户使用"
-			echo "# 以下shell命令仅供参考,需要根据路由器实际情况修改"
-			echo "# 需要特别注意iptables防火墙规则的顺序非常关键,要合理安排执行顺序"
-			echo -e "wan_dev='pppoe-wan' # 外网设备名\n"
+			iptables_script="/usr/node/iptables.txt"
+			rm -rf $iptables_script
+			echo "# 如果路由器支持自定义防火墙,可以用以下命令代替端口转发设置" >>$iptables_script
+			echo "# 此功能为实验性质,仅供高级用户使用" >>$iptables_script
+			echo "# 以下shell命令仅供参考,需要根据路由器实际情况修改" >>$iptables_script
+			echo "# 需要特别注意iptables防火墙规则的顺序非常关键,要合理安排执行顺序" >>$iptables_script
+			echo -e "wan_dev='pppoe-wan' # 外网设备名\n" >>$iptables_script
 			while read line; do
 				protocol=$(echo $line | cut -d ' ' -f 1)
 				port=$(echo $line | cut -d ' ' -f 2)
-				echo "iptables -t nat -A PREROUTING -i \$wan_dev -p $protocol -m $protocol --dport $port -j DNAT --to-destination $lan_ip"
-				echo -e "iptables -A FORWARD -d $lan_ip/32 -i \$wan_dev -p $protocol -m $protocol --dport $port -j ACCEPT\n"
+				echo "iptables -t nat -A PREROUTING -i \$wan_dev -p $protocol -m $protocol --dport $port -j DNAT --to-destination $lan_ip" >>$iptables_script
+				echo -e "iptables -A FORWARD -d $lan_ip/32 -i \$wan_dev -p $protocol -m $protocol --dport $port -j ACCEPT\n" >>$iptables_script
 			done </usr/node/port.txt
 
 			len=$(maskdigits "$lan_mask")
@@ -118,7 +122,8 @@ while true; do
 				fi
 			done
 
-			echo "iptables -t nat -A POSTROUTING -s $ip/$len -o \$wan_dev -j MASQUERADE"
+			echo "iptables -t nat -A POSTROUTING -s $ip/$len -o \$wan_dev -j MASQUERADE" >>$iptables_script
+			# cat $iptables_script
 			echo "==========================================================================="
 			foundport=1
 			last=$(date +%s)

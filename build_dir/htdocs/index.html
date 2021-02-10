@@ -1,0 +1,454 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<!-- <meta name="applicable-device" content="mobile">	 -->
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"> </script>
+	<style>
+		body {
+			font-family: Arial;
+		}
+
+		/* Style the tab */
+		.tab {
+			overflow: hidden;
+			border: 1px solid #ccc;
+			background-color: #f1f1f1;
+		}
+
+		/* Style the buttons inside the tab */
+		.tab button {
+			background-color: inherit;
+			float: left;
+			border: none;
+			outline: none;
+			cursor: pointer;
+			padding: 14px 16px;
+			transition: 0.3s;
+			font-size: 17px;
+		}
+
+		/* Change background color of buttons on hover */
+		.tab button:hover {
+			background-color: #ddd;
+		}
+
+		/* Create an active/current tablink class */
+		.tab button.active {
+			background-color: #ccc;
+		}
+
+		/* Style the tab content */
+		.tabcontent {
+			display: none;
+			padding: 6px 12px;
+			border: 1px solid #ccc;
+			border-top: none;
+		}
+
+		/* Style the close button */
+		.topright {
+			float: right;
+			cursor: pointer;
+			font-size: 28px;
+		}
+
+		.topright:hover {
+			color: red;
+		}
+
+		.panel {
+			padding: 5px;
+			font-weight: bold;
+			//background:#FE6714;
+		}
+
+		.input_panel {
+			padding: 5px;
+		}
+
+		.info_text {
+			resize: none;
+			width: 100%;
+			height: 30px;
+			border: 1px solid #45a049;
+			outline: none;
+		}
+
+		.info_text_port {
+			resize: none;
+			width: 100%;
+			height: 100px;
+			border: 1px solid #45a049;
+			outline: none;
+		}
+
+		.info_text_rule {
+			resize: none;
+			width: 100%;
+			height: 360px;
+			border: 1px solid #45a049;
+			outline: none;
+		}
+
+		.info_text_radio {}
+
+		.dialog {
+			display: none;
+			color: #F00;
+		}
+
+		.ui-input-text {
+			border: 1px solid #e0e0e0;
+			margin: 5px 0;
+			background-color: #fff;
+			padding: 0;
+			border-radius: 4px;
+		}
+	</style>
+</head>
+
+<body>
+	<h2>甜糖控制面板</h2>
+
+	<div class="tab">
+		<button class="tablinks" onclick="openTab(event, 'tab_info')" id="defaultOpen">信息</button>
+		<button class="tablinks" onclick="openTab(event, 'tab_setting')">通知设置</button>
+		<button class="tablinks" onclick="openTab(event, 'tab_login')">获取cookie</button>
+		<button class="tablinks" onclick="openTab(event, 'tab_readme')">使用说明</button>
+	</div>
+
+	<div id="tab_info" class="tabcontent">
+		<!-- <span onclick="this.parentElement.style.display='none'" class="topright">&times</span> -->
+		<div>
+			<div class="panel">
+				UID
+			</div>
+			<div class="input_panel" id="qrcode">
+			</div>
+			<div class="input_panel">
+				<input id="uid" class="info_text" readonly="readonly" value="正在玩命加载..."></input>
+			</div>
+
+			<div class="panel">
+				端口
+			</div>
+			<div class="input_panel">
+				<textarea id="port" class="info_text_port" wrap=off readonly="readonly">正在玩命加载...</textarea>
+			</div>
+
+			<div class="panel">
+				防火墙规则(仅供高级用户参考)
+			</div>
+			<div class="input_panel">
+				<textarea id="iptables_rule" class="info_text_rule" wrap=off readonly="readonly">正在玩命加载...</textarea>
+			</div>
+		</div>
+	</div>
+
+	<div id="tab_setting" class="tabcontent">
+		<!-- <span onclick="this.parentElement.style.display='none'" class="topright">&times</span> -->
+
+		<div class="panel">
+			Server酱key
+		</div>
+		<div class="input_panel">
+			<input id="sckey" class="info_text"></input>
+		</div>
+
+		<div class="panel">
+			电报api_key
+		</div>
+		<div class="input_panel">
+			<input id="tg_api_key" class="info_text"></input>
+		</div>
+
+		<div class="panel">
+			电报chat_id
+		</div>
+		<div class="input_panel">
+			<input id="tg_chat_id" class="info_text"></input>
+		</div>
+
+		<div class="panel">
+			访问电报的代理字符串(例如http://192.168.0.1:3128)，不使用代理留空
+		</div>
+		<div class="input_panel">
+			<input id="tg_proxy" class="info_text"></input>
+		</div>
+
+		<div class="panel">
+			自动使用加成卡(推荐方案2)
+		</div>
+
+		<div class="input_panel">
+			<input type="radio" id="auto_turbo_0" class="info_text_radio" name="auto_turbo" value="0" checked>
+			<label for="huey">禁用</label>
+		</div>
+
+		<div class="input_panel">
+			<input type="radio" id="auto_turbo_1" class="info_text_radio" name="auto_turbo" value="1">
+			<label for="dewey">方案1-使用速率最高的加成卡</label>
+		</div>
+
+		<div class="input_panel">
+			<input type="radio" id="auto_turbo_2" class="info_text_radio" name="auto_turbo" value="2">
+			<label for="louie">方案2-只使用"星愿加成卡"</label>
+		</div>
+
+		<div id="setting_prompt" class="dialog">
+
+		</div>
+
+		<div class="input_panel">
+			<button id="btn_save_config" type="button" onclick="save_config()">保存</button>
+		</div>
+
+	</div>
+
+	<div id="tab_login" class="tabcontent">
+		<!-- <span onclick="this.parentElement.style.display='none'" class="topright">&times</span> -->
+
+		<div class="panel">
+			手机号
+		</div>
+		<div class="input_panel">
+			<input id="mobile" class="info_text"></input>
+		</div>
+		<div class="panel">
+			验证码
+		</div>
+		<div class="input_panel">
+			<input id="code" class="info_text"></input>
+		</div>
+
+		<div id="login_prompt" class="dialog">
+		</div>
+
+		<div class="input_panel">
+			<button id="btn_get_code" type="button" onclick="getCode()">获取验证码</button>
+			&nbsp;
+			<button id="btn_login" type="button" onclick="getCookie()">登录</button>
+		</div>
+	</div>
+	<div id="tab_readme" class="tabcontent">
+	<h3>信息</h3>
+	<P>可扫描二维码添加甜糖客户端，如果路由器UPnP无法自动映射端口，可以根据提示的端口手动到路由器上设置</P>
+	<P>防火墙规则仅供高级用户参考，小白莫碰</P>
+	<h3>通知设置</h3>
+	<P>此页用于设置自动收获星愿后的通知方式，如果不需要留空即可</P>
+	<P>自动使用加成卡建议使用方案2</P>
+	<h3>获取cookie</h3>
+	<P>只需要执行一次，如果通知提醒cookie过期，就再执行一次</P>
+	<div style="color:#45a049">
+	<P>如果觉得还有点用，麻烦用一下我的邀请码631441，有加成卡15张，我也有推广收入，转载请注明出处</P>
+	</div>
+	</div>
+
+	<script type="text/javascript">
+		function openTab(evt, tabName) {
+			var i,
+				tabcontent,
+				tablinks;
+			tabcontent = document.getElementsByClassName("tabcontent");
+			for (i = 0; i < tabcontent.length; i++) {
+				tabcontent[i].style.display = "none";
+			}
+			tablinks = document.getElementsByClassName("tablinks");
+			for (i = 0; i < tablinks.length; i++) {
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			}
+			document.getElementById(tabName).style.display = "block";
+			evt.currentTarget.className += " active";
+			if (tabName == "tab_setting")
+				load_config();
+		}
+
+		function load_config() {
+			$.get("get_info.cgi?m=2", function (data, status) {
+				$("#sckey").val(data.sckey);
+				$("#tg_api_key").val(data.tg_api_key);
+				$("#tg_chat_id").val(data.tg_chat_id);
+				$("#tg_proxy").val(data.tg_proxy);
+				$('input:radio[name=auto_turbo]')[data.auto_turbo].checked = true;
+			}
+			);
+		}
+
+		// Get the element with id="defaultOpen" and click on it
+		document.getElementById("defaultOpen").click();
+		var qrcode = new QRCode(document.getElementById("qrcode"),
+			{
+				text: "",
+				width: 150,
+				height: 150,
+				colorDark: "#000000",
+				colorLight: "#ffffff",
+				correctLevel: QRCode.CorrectLevel.H
+			}
+		);
+
+		refresh_info();
+		var int = self.setInterval("refresh_info()", 3000);
+		var _uid = "";
+		var _port = "";
+		var _iptables = "";
+
+		function refresh_info() {
+			if ($("#tab_info").css("display") == "none") {
+				return;
+			}
+
+			$.get("get_info.cgi?m=1", function (data, status) {
+				if (_uid != data.uid) {
+					_uid = data.uid;
+					$("#uid").val(data.uid);
+					qrcode.clear();
+					qrcode.makeCode(data.uid);
+				}
+				if (_port != data.port) {
+					_port = data.port;
+					$("#port").text(data.port);
+				}
+
+				if (_iptables != data.iptables) {
+					_iptables = data.iptables;
+					$("#iptables_rule").text(data.iptables);
+				}
+			}
+			);
+		}
+
+		function save_config() {
+			$("#btn_save_config").attr("disabled", "true");
+			var dlg = $("#setting_prompt");
+			dlg.attr("style", "display:none;");
+			dlg.text("");
+
+			setTimeout(function () {
+				var c = {};
+				c.sckey = $("#sckey").val().replace(/(^\s*)|(\s*$)/g,"");
+				c.tg_api_key = $("#tg_api_key").val().replace(/(^\s*)|(\s*$)/g,"");
+				c.tg_chat_id = $("#tg_chat_id").val().replace(/(^\s*)|(\s*$)/g,"");
+				c.tg_proxy = $("#tg_proxy").val().replace(/(^\s*)|(\s*$)/g,"");
+				c.auto_turbo = $('input:radio[name=auto_turbo]:checked').val();
+				$.post("save_info.cgi", JSON.stringify(c),
+					function (result) {
+						dlg.text(result.msg);
+						dlg.fadeIn();
+						$("#btn_save_config").removeAttr("disabled");
+					}
+				);
+			}, 100);
+		}
+
+		function checkMobile(str) {
+			var re = /^1\d{10}$/;
+			if (re.test(str)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		function checCode(str) {
+			var re = /^\d{6}$/;
+			if (re.test(str)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		function getCode() {
+			var dlg = $("#login_prompt");
+			dlg.attr("style", "display:none;");
+			dlg.text("");
+
+			var mobile = $("#mobile").val();
+
+			if (!checkMobile(mobile)) {
+				alert("请输入正确的手机号码！");
+				return;
+			}
+
+			$.get("get_info.cgi?m=3&phone=" + mobile,
+				function (result) {
+					if (result.errCode == 0) {
+						dlg.text("验证码发送成功");
+						dlg.fadeIn();
+					}
+					else {
+						dlg.text("验证码发送失败" + result.msg);
+						dlg.fadeIn();
+					}
+				}
+			);
+
+			var $code = $("#btn_get_code");
+			$code.attr("disabled", "true");
+			var validCode = true;
+			var time = 60;
+
+			if (validCode) {
+				validCode = false;
+				var t = setInterval(function () {
+					time--;
+					$code.html(time + "秒");
+					if (time == 0) {
+						clearInterval(t);
+						$code.html("重新获取");
+						$code.removeAttr("disabled");
+						validCode = true;
+					}
+				}, 1000)
+			}
+		}
+
+		function getCookie() {
+			$("#btn_login").attr("disabled", "true");
+			var dlg = $("#login_prompt");
+			dlg.attr("style", "display:none;");
+			dlg.text("");
+
+			setTimeout(function () {
+				var code = $("#code").val();
+				var tel = $("#mobile").val();
+
+				if (!checkMobile(tel)) {
+					alert("请输入正确的手机号码！");
+					$("#btn_login").removeAttr("disabled");
+					return;
+				}
+
+				if (!checCode(code)) {
+					alert("请输入正确的验证码！");
+					$("#btn_login").removeAttr("disabled");
+					return;
+				}
+
+				$.get("get_info.cgi?m=4&code=" + code + "&tel=" + tel,
+					function (result) {
+						if (result.errCode == 0) {
+							dlg.text("cookie获取成功");
+							dlg.fadeIn();
+						}
+						else {
+							dlg.text(result.msg);
+							dlg.fadeIn();
+						}
+						$("#btn_login").removeAttr("disabled");
+					}
+				);
+
+			}, 100);
+		}
+	</script>
+</body>
+
+</html>
