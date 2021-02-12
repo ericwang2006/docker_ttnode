@@ -24,10 +24,8 @@
 	```
 	- Linux版本运行`crontab -e`，参考以上内容，自行编辑自动运行任务
 4. 配置
-	- docker版直接进入容器
-		```
-		docker exec -it ttnode /bin/bash
-		```
+	- docker版推荐使用浏览器进行配置，在浏览器地址栏输入 http://容器IP:1043 直接在网页界面配置，也可以进入容器`docker exec -it ttnode /bin/bash`用命令行配置
+
 	- Linux版下载Shell脚本
 		```
 		mkdir -p /usr/node
