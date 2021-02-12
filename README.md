@@ -105,12 +105,12 @@ docker exec -it ttnode /bin/bash
 
 ## 查询UUID：
 
-```
-./usr/node/ttnode -p /mnts
-or
-#容器外执行
-docker logs ttnode
-```
+- 浏览器地址栏输入 `http：//容器IP:1043` (推荐)
+
+- 容器内执行`./usr/node/ttnode -p /mnts`
+
+- 容器外执行`docker logs ttnode`
+
 
 # 已知问题
 
@@ -124,6 +124,18 @@ docker logs ttnode
 [2020-11-18 10:25:34] ttnode启动失败,再来一次,
 /bin/sh: 1: cannot create /proc/sys/net/core/wmem_max: Directory nonexistent,
 ```
-- 重新创建容器，即使是同样的IP和mac地址，也会导致ttnode的uid变化
-
+- 在x86架构下，重新创建容器，即使是同样的IP和mac地址，也会导致ttnode的uid变化
+	根据日志`utility.cpp(2511)-GetMacFromIfreq: ioctl error = 19!`推测，ttnode内部应该是使用ioctl函数来获取mac地址的，在qemu中不支持ioctl调用是个已知问题
+	可以参考[这里](https://github.com/multiarch/qemu-user-static/issues/101)，这个问题可以用下面的方法证实
+	```
+	$ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes -c yes
+	$ docker run --privileged -t -i armv7/armhf-ubuntu /bin/bash
+	$ apt-get update
+	$ apt-get install uml-utilities
+	$ tunctl
+	Unsupported ioctl: cmd=0x400454ca
+	TUNSETIFF: Function not implemented
+	```
+- 在x86架构下，UPnP功能无效，需要手动在路由器上做端口转发
+ 
 #### 如果觉得还有点用，麻烦用一下我的邀请码631441，有加成卡15张，我也有推广收入
