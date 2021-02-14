@@ -136,6 +136,7 @@ docker exec -it ttnode /bin/bash
 	Unsupported ioctl: cmd=0x400454ca
 	TUNSETIFF: Function not implemented
 	```
-- 在x86架构下，UPnP功能无效，需要手动在路由器上做端口转发
- 
+- ~~在x86架构下，UPnP功能无效，需要手动在路由器上做端口转发~~
+	最新的方案改用qemu模拟arm32架构(原来是模拟arm64架构)，大大改善了x86下路由器UPnP不生效的问题，如果使用最新镜像UPnP还是有问题，请继续使用端口映射的方案
+
 #### 如果觉得还有点用，麻烦用一下我的邀请码631441，有加成卡15张，我也有推广收入
