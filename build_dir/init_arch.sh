@@ -3,7 +3,7 @@ case "$(uname -m)" in
 x86_64)
 	dpkg --add-architecture armhf
 	apt-get update
-	apt-get -y --no-install-recommends install libc6:armhf libstdc++6:armhf openssl:armhf
+	apt-get -y --no-install-recommends install libc6:armhf libstdc++6:armhf
 	apt-get clean
 	apt-get purge -y --auto-remove
 
