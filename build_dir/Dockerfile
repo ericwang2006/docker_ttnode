@@ -38,7 +38,7 @@ ENV LANG C.UTF-8
 # start.sh用脚本监控ttnode进程,不用cron
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    apt-get update && apt-get install cron procps net-tools iputils-ping ca-certificates curl jq nano bc -y --no-install-recommends && \
+    apt-get update && apt-get install openssl cron procps net-tools iputils-ping ca-certificates curl jq nano bc -y --no-install-recommends && \
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
 	ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
 	echo 'Asia/Shanghai' >/etc/timezone && \
