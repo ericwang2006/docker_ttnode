@@ -42,17 +42,15 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
 	ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
 	echo 'Asia/Shanghai' >/etc/timezone && \
-    apt-get clean && \
-    apt-get purge -y --auto-remove
+    rm -rf /var/lib/apt/lists/*
 
-COPY ttnode_task.sh start.sh qr.sh port.sh init_arch.sh /usr/node/
-
+COPY . /usr/node/
 COPY --from=builder /thttpd-2.29/thttpd /usr/node/
-COPY htdocs /usr/node/htdocs/
-
-RUN /usr/node/init_arch.sh && rm /usr/node/init_arch.sh
+RUN /usr/node/init_arch.sh && rm /usr/node/init_arch.sh && rm /usr/node/Dockerfile
 
 WORKDIR /usr/node
+
+EXPOSE 1043
 
 VOLUME ["/config"]
 
