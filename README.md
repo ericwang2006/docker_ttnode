@@ -111,6 +111,12 @@ docker exec -it ttnode /bin/bash
 
 - 容器外执行`docker logs ttnode`
 
+## 环境变量
+
+|名称|说明|取值1|其他值
+| :--- | :--- | :--- | :--- |
+|DISABLE_ATUO_TASK|自动收星愿|禁用|启用
+|DISABLE_CONTROL_PANEL|控制面板|禁用|启用
 
 # 已知问题
 
