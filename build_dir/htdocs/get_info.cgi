@@ -33,7 +33,9 @@ case $FORM_m in
 	;;
 2)
 	CONFIG_FILE="/config/config.json"
-	jq 'del(.token)' $CONFIG_FILE
+	create_config_file $CONFIG_FILE
+	# jq 'del(.token)' $CONFIG_FILE
+	cat $CONFIG_FILE
 	;;
 3)
 	curl -s -X POST "https://tiantang.mogencloud.com/web/api/login/code?phone=$FORM_phone"

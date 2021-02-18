@@ -44,7 +44,9 @@ if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 	crontab $CONFIG_DIR/crontab_list.sh
 fi
 
-/usr/node/thttpd -u root -p 1043 -d /usr/node/htdocs -c "**.cgi"
+if [[ $DISABLE_CONTROL_PANEL != "1" ]]; then
+	/usr/node/thttpd -u root -p 1043 -d /usr/node/htdocs -c "**.cgi"
+fi
 
 foundport=0
 last=$(date +%s)
@@ -70,14 +72,6 @@ while true; do
 		esac
 		$qemu /usr/node/ttnode -p /mnts
 		/usr/node/qr.sh
-
-		# sleep 20
-		# num=`ps fax | grep '/ttnode' | egrep -v 'grep|echo|rpm|moni|guard' | wc -l`;
-		# if [ $num -lt 1 ];then
-		# d=`date '+%F %T'`;
-		# echo "[$d] ttnode启动失败,再来一次"
-		# /usr/node/ttnode -p /mnts
-		# fi
 	fi
 
 	if [ $foundport -eq 0 ]; then
@@ -124,7 +118,7 @@ while true; do
 
 			echo "iptables -t nat -A POSTROUTING -s $ip/$len -o \$wan_dev -j MASQUERADE" >>$iptables_script
 			# cat $iptables_script
-			echo "==========================================================================="
+			echo -e "查看更多信息请访问【http://$lan_ip:1043】"
 			foundport=1
 			last=$(date +%s)
 		else
