@@ -24,7 +24,8 @@ else
 	echo "==========================================================================="
 	echo "如果觉得还有点用，麻烦用一下我的邀请码631441，有加成卡15张，我也有推广收入"
 	# echo -e "甜糖客户端如果不能扫描到您的设备，请在浏览器访问\nhttps://ericwang2006.github.io/docker_ttnode/qrgen.htm?str=$uid\n获取二维码并用甜糖客户端扫描添加(纯js实现,不会发生数据泄露)"
-	lan_ip=$(ifconfig eth0 | awk -F'[ ]+|:' '/inet /{print $3}')
+	dev=$(find /sys/class/net -type l -not -lname '*virtual*' -printf '%f\n' | head -n 1)
+	lan_ip=$(ifconfig $dev | awk -F'[ ]+|:' '/inet /{print $3}')
 	echo -e "请在浏览器访问【http://$lan_ip:1043】甜糖控制面板，在这里可以扫码添加客户端，也可进行通知设置"
 	echo "如有任何担心，可将此【$uid】UID复制，选择您信任的工具生成二维码并用甜糖客户端扫描添加"
 	# qrencode -t ANSI $uid
