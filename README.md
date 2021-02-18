@@ -148,6 +148,7 @@ docker exec -it ttnode /bin/bash
 	这个问题目前有了最新**进展**，经过多次测试发现ttnode的uid和以下因素同时相关
 	- **hostname**
 	- **网卡的mac地址**
+ 
 	由于此前创建docker容器时并未指定hostname，所以每次创建容器都是随机的hostname，导致出现了随机的uid，目前已经修改了相关示例代码，创建容器时指定了hostname
 
 - ~~在x86架构下，UPnP功能无效，需要手动在路由器上做端口转发~~
