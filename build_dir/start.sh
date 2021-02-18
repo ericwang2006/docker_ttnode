@@ -32,6 +32,8 @@ maskdigits() {
 	rm /tmp/num
 }
 
+echo
+
 if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 	service cron start
 	move_config
@@ -50,6 +52,7 @@ fi
 
 foundport=0
 last=$(date +%s)
+old_port=""
 while true; do
 	num=$(ps fax | grep '/ttnode' | egrep -v 'grep|echo|rpm|moni|guard' | wc -l)
 	if [ $num -lt 1 ]; then
@@ -78,47 +81,49 @@ while true; do
 		netstat -tunlp | grep "$(ps fax | grep '/ttnode' | egrep -v 'grep|echo|rpm|moni|guard' | awk '{print $1}')/" | grep -v '127.0.0.1\|17331' | awk '{sub(/0.0.0.0:/,""); print $1,$4}' | sort -k 2n -k 1 >/usr/node/port.txt
 		len=$(sed -n '$=' /usr/node/port.txt)
 		if [[ $len -gt 4 ]]; then
-			echo "==========================================================================="
-			echo $($qemu /usr/node/ttnode -h | head -n 1)
-			d=$(date '+%F %T')
-			echo "[$d] 如果UPNP失效，请在路由器上对下列端口做转发"
-			cat /usr/node/port.txt | awk '{print $1,$2" "}'
-			# awk '{x[$2]=x[$2]" "$1} END {for(i in x){print i x[i]}}' /usr/node/port.txt |awk '{print $2","$3,$1" "}'|sed 's/, / /'
+			new_port=$(cat /usr/node/port.txt)
+			if [ "$old_port" != "$new_port" ]; then
+				old_port=$new_port
+				echo "==========================================================================="
+				echo $($qemu /usr/node/ttnode -h | head -n 1)
+				d=$(date '+%F %T')
+				echo "[$d] 如果UPNP失效，请在路由器上对下列端口做转发"
+				cat /usr/node/port.txt | awk '{print $1,$2" "}'
+				# awk '{x[$2]=x[$2]" "$1} END {for(i in x){print i x[i]}}' /usr/node/port.txt |awk '{print $2","$3,$1" "}'|sed 's/, / /'
 
-			lan_dev="eth0"
-			lan_ip=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $3}')
-			lan_mask=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $5}')
+				lan_dev="eth0"
+				lan_ip=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $3}')
+				lan_mask=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $5}')
 
-			iptables_script="/usr/node/iptables.txt"
-			rm -rf $iptables_script
-			echo "# 如果路由器支持自定义防火墙,可以用以下命令代替端口转发设置" >>$iptables_script
-			echo "# 此功能为实验性质,仅供高级用户使用" >>$iptables_script
-			echo "# 以下shell命令仅供参考,需要根据路由器实际情况修改" >>$iptables_script
-			echo "# 需要特别注意iptables防火墙规则的顺序非常关键,要合理安排执行顺序" >>$iptables_script
-			echo -e "wan_dev='pppoe-wan' # 外网设备名\n" >>$iptables_script
-			while read line; do
-				protocol=$(echo $line | cut -d ' ' -f 1)
-				port=$(echo $line | cut -d ' ' -f 2)
-				echo "iptables -t nat -A PREROUTING -i \$wan_dev -p $protocol -m $protocol --dport $port -j DNAT --to-destination $lan_ip" >>$iptables_script
-				echo -e "iptables -A FORWARD -d $lan_ip/32 -i \$wan_dev -p $protocol -m $protocol --dport $port -j ACCEPT\n" >>$iptables_script
-			done </usr/node/port.txt
+				iptables_script="/usr/node/iptables.txt"
+				echo "# 如果路由器支持自定义防火墙,可以用以下命令代替端口转发设置" >$iptables_script
+				echo "# 此功能为实验性质,仅供高级用户使用" >>$iptables_script
+				echo "# 以下shell命令仅供参考,需要根据路由器实际情况修改" >>$iptables_script
+				echo "# 需要特别注意iptables防火墙规则的顺序非常关键,要合理安排执行顺序" >>$iptables_script
+				echo -e "wan_dev='pppoe-wan' # 外网设备名\n" >>$iptables_script
+				while read line; do
+					protocol=$(echo $line | cut -d ' ' -f 1)
+					port=$(echo $line | cut -d ' ' -f 2)
+					echo "iptables -t nat -A PREROUTING -i \$wan_dev -p $protocol -m $protocol --dport $port -j DNAT --to-destination $lan_ip" >>$iptables_script
+					echo -e "iptables -A FORWARD -d $lan_ip/32 -i \$wan_dev -p $protocol -m $protocol --dport $port -j ACCEPT\n" >>$iptables_script
+				done </usr/node/port.txt
 
-			len=$(maskdigits "$lan_mask")
-			for i in $(seq 1 4); do
-				a=$(echo $lan_ip | cut -d '.' -f $i)
-				b=$(echo $lan_mask | cut -d '.' -f $i)
-				d=$((a & b))
+				len=$(maskdigits "$lan_mask")
+				for i in $(seq 1 4); do
+					a=$(echo $lan_ip | cut -d '.' -f $i)
+					b=$(echo $lan_mask | cut -d '.' -f $i)
+					d=$((a & b))
 
-				if [ $i == 1 ]; then
-					ip="$d"
-				else
-					ip=$ip".$d"
-				fi
-			done
+					if [ $i == 1 ]; then
+						ip="$d"
+					else
+						ip=$ip".$d"
+					fi
+				done
 
-			echo "iptables -t nat -A POSTROUTING -s $ip/$len -o \$wan_dev -j MASQUERADE" >>$iptables_script
-			# cat $iptables_script
-			echo -e "查看更多信息请访问【http://$lan_ip:1043】"
+				echo "iptables -t nat -A POSTROUTING -s $ip/$len -o \$wan_dev -j MASQUERADE" >>$iptables_script
+				echo -e "查看更多信息请访问【http://$lan_ip:1043】"
+			fi
 			foundport=1
 			last=$(date +%s)
 		else

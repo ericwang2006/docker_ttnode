@@ -8,6 +8,7 @@ services:
     # 内存限制
     mem_limit: 1024m
     container_name: ttnode
+    hostname: ttnode1
     privileged: true
     restart: always
     mac_address: C2:F2:9C:C5:B2:94

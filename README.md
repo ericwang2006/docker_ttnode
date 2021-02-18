@@ -48,6 +48,7 @@ docker network create -d macvlan --subnet=192.168.2.0/24 --gateway=192.168.2.88 
 docker run -itd \
   -v /mnt/data/ttnode:/mnts \
   --name ttnode \
+  --hostname ttnode1 \
   --net=macnet --ip=192.168.2.2 --dns=114.114.114.114 --mac-address C2:F2:9C:C5:B2:94 \
   --privileged=true \
   --restart=always \
@@ -59,6 +60,7 @@ docker run -itd \
 docker run -itd \
   -v /mnt/data/ttnode:/mnts \
   --name ttnode \
+  --hostname ttnode1 \
   --net=host \
   --privileged=true \
   --restart=always \
@@ -74,6 +76,7 @@ services:
   ttnode:
     image: ericwang2006/ttnode
     container_name: ttnode
+    hostname: ttnode1
     privileged: true
     restart: always
     mac_address: C2:F2:9C:C5:B2:94
@@ -113,7 +116,7 @@ docker exec -it ttnode /bin/bash
 
 ## 环境变量
 
-|名称|说明|取值1|其他值
+|名称|说明|1|非1
 | :--- | :--- | :--- | :--- |
 |DISABLE_ATUO_TASK|自动收星愿|禁用|启用
 |DISABLE_CONTROL_PANEL|控制面板|禁用|启用
@@ -130,9 +133,9 @@ docker exec -it ttnode /bin/bash
 [2020-11-18 10:25:34] ttnode启动失败,再来一次,
 /bin/sh: 1: cannot create /proc/sys/net/core/wmem_max: Directory nonexistent,
 ```
-- 在x86架构下，重新创建容器，即使是同样的IP和mac地址，也会导致ttnode的uid变化
+- ~~在x86架构下，重新创建容器，即使是同样的IP和mac地址，也会导致ttnode的uid变化
 	根据日志`utility.cpp(2511)-GetMacFromIfreq: ioctl error = 19!`推测，ttnode内部应该是使用ioctl函数来获取mac地址的，在qemu中不支持ioctl调用是个已知问题
-	可以参考[这里](https://github.com/multiarch/qemu-user-static/issues/101)，这个问题可以用下面的方法证实
+	可以参考[这里](https://github.com/multiarch/qemu-user-static/issues/101)，这个问题可以用下面的方法证实~~
 	```
 	$ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes -c yes
 	$ docker run --privileged -t -i armv7/armhf-ubuntu /bin/bash
@@ -142,6 +145,11 @@ docker exec -it ttnode /bin/bash
 	Unsupported ioctl: cmd=0x400454ca
 	TUNSETIFF: Function not implemented
 	```
+	这个问题目前有了最新**进展**，经过多次测试发现ttnode的uid和以下因素同时相关
+	- **hostname**
+	- **网卡的mac地址**
+	由于此前创建docker容器时并未指定hostname，所以每次创建容器都是随机的hostname，导致出现了随机的uid，目前已经修改了相关示例代码，创建容器时指定了hostname
+
 - ~~在x86架构下，UPnP功能无效，需要手动在路由器上做端口转发~~
 	最新的方案改用qemu模拟arm32架构(原来是模拟arm64架构)，大大改善了x86下路由器UPnP不生效的问题，如果使用最新镜像UPnP还是有问题，请继续使用端口映射的方案
 

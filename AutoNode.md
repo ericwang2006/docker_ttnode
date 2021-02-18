@@ -56,6 +56,7 @@
 		  -v /mnt/data/ttnode:/mnts \
 		  -v ~/config:/config \
 		  --name ttnode \
+		  --hostname ttnode1 \
 		  --net=host \
 		  --privileged=true \
 		  --restart=always \
