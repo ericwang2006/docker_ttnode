@@ -92,7 +92,7 @@ while true; do
 				# awk '{x[$2]=x[$2]" "$1} END {for(i in x){print i x[i]}}' /usr/node/port.txt |awk '{print $2","$3,$1" "}'|sed 's/, / /'
 
 				# lan_dev=$(find /sys/class/net -type l -not -lname '*virtual*' -printf '%f\n' | head -n 1)
-				lan_dev=$(route | grep defaul | awk '{print $8}')
+				lan_dev=$(route | grep defaul | awk '{print $8}' | head -n 1)
 				lan_ip=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $3}')
 				lan_mask=$(ifconfig $lan_dev | awk -F'[ ]+|:' '/inet /{print $5}')
 
