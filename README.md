@@ -121,7 +121,32 @@ docker exec -it ttnode /bin/bash
 |DISABLE_ATUO_TASK|自动收星愿|禁用|启用
 |DISABLE_CONTROL_PANEL|控制面板|禁用|启用
 
-# 已知问题
+## FAQ
+1. 怎么多开?
+
+	使用方法一macvlan，友情提示：不是开得越多越好。
+
+2. 主路由就是docker宿主机，为啥macvlan用不了？
+
+	劝你们放过软路由吧，如果不服到恩山翻翻其他大神的贴子，有解决方案，但是路由器真的不是这么玩的。
+
+3. 升级镜像如何保持uid不变？
+
+	uid和mac地址，hostname高度相关，缓存目录也尽可能和原来保持一致，建议按照以下步骤操作，如果不幸uid还是变化了，那就随缘吧。
+	- 记录原来的mac地址，hostname和缓存目录(hostname可以进入容器执行`hostname`命令获取)
+	- 记录/config/config.json文件中的配置参数
+	- 删除原来容器
+	- 执行`docker pull ericwang2006/ttnode`获取最新镜像
+	- 创建新的容器，mac地址，hostname和缓存目录要和原来一样
+	- 更新了最新的镜像后,配置参数可以在控制面板中设置
+	- 建议将/config目录映射到宿主机目录，下次再更新就不需要设置配置参数了
+	- 即使uid发生了变化也不要紧，只要缓存目录不变，在手机客户端重新绑定新的uid就可以了
+
+4. 我不用自动收割星愿，不用控制面板，可以不启用这两项功能吗？
+
+	参看环境变量，如果你不懂啥叫环境变量，那就开着吧，基本不占用啥资源。
+
+## 已知问题
 
 - 日志中会提示**cannot create /proc/sys/net/core/wmem_max: Directory nonexistent**，是因为在daocker中不能设置Linux内核参数，不影响使用
 - ~~docker中ttnode第一次启动后大约20秒后有自动退出的概率，不用理会，脚本会再次启动ttnode~~(这是由于ttnode自动升级导致的)
