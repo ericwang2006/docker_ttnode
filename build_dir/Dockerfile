@@ -18,6 +18,7 @@ LABEL maintainer="eric <ericwang2006@gmail.com>"
 
 ENV TZ=Asia/Shanghai
 ENV LANG C.UTF-8
+ARG EMULATION_PLATFORM=arm32
 
 # cron模式
 # RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
