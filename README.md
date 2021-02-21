@@ -146,6 +146,10 @@ docker exec -it ttnode /bin/bash
 
 	参看环境变量，如果你不懂啥叫环境变量，那就开着吧，基本不占用啥资源。
 
+5. 为什么我是优质网络，但确一致没有流量？
+
+	CDN流量去如黄鹤，来如晨风。玩玩就好，何必认真。
+
 ## 已知问题
 
 - 日志中会提示**cannot create /proc/sys/net/core/wmem_max: Directory nonexistent**，是因为在daocker中不能设置Linux内核参数，不影响使用
