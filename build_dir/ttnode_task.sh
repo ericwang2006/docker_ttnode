@@ -80,7 +80,7 @@ function login() {
 
 show_help() {
 	printf "
-Version: V0.02
+Version: V0.03
 Usage  : $0 [Options]
 Options:
         login               登录
@@ -134,15 +134,15 @@ withdraw() {
 		fi
 		text=$(
 			curl -s -X POST \
-			-H "authorization:$token" \
-			-H "Content-Type:application/x-www-form-urlencoded" \
-			--data-urlencode "score=$score" \
-			--data-urlencode "real_name=$real_name" \
-			--data-urlencode "card_id=$card_id" \
-			--data-urlencode "bank_name=$bank_name" \
-			--data-urlencode "sub_bank_name=$sub_bank_name" \
-			--data-urlencode "type=$type" \
-			"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+				-H "authorization:$token" \
+				-H "Content-Type:application/x-www-form-urlencoded" \
+				--data-urlencode "score=$score" \
+				--data-urlencode "real_name=$real_name" \
+				--data-urlencode "card_id=$card_id" \
+				--data-urlencode "bank_name=$bank_name" \
+				--data-urlencode "sub_bank_name=$sub_bank_name" \
+				--data-urlencode "type=$type" \
+				"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
 		)
 		errCode=$(echo $text | jq '.errCode')
 		d=$(date "+%Y-%m-%d %H:%M:%S")
@@ -162,7 +162,11 @@ notify() {
 	sckey=$(jq -r '.sckey' $cfile)
 	if [ -n "$sckey" ]; then
 		desp=$(echo "$1" | sed ":a;N;s/\n/#LF/g;ta" | sed "s/#LF/\n\n/g" | sed "s/\*/\*\*/g")
-		curl -s -X POST -d "text=甜糖日报&desp=$desp" https://sc.ftqq.com/$sckey.send >/dev/null 2>&1
+		if [[ $sckey == SCT* ]]; then #$sckey以SCT开头(Turbo版)
+			curl -s -X POST -d "title=甜糖日报&desp=$desp" https://sctapi.ftqq.com/$sckey.send >/dev/null 2>&1
+		else
+			curl -s -X POST -d "text=甜糖日报&desp=$desp" https://sc.ftqq.com/$sckey.send >/dev/null 2>&1
+		fi
 	fi
 
 	# tg通知
@@ -186,7 +190,7 @@ config_notify() {
 	tfile="$CONFIG_DIR/.config.json"
 	create_config_file $cfile
 
-	read -p "请输入Server酱的SCKEY,不使用Server酱通知直接按回车：" sckey
+	read -p "请输入Server酱的key(支持Turbo版key,会自动判断),不使用Server酱通知直接按回车：" sckey
 	if [ -n "$sckey" ]; then
 		jq ".+{\"sckey\":\"$sckey\"}" $cfile >$tfile && mv $tfile $cfile
 	else
