@@ -187,6 +187,20 @@
 		</div>
 
 		<div class="panel">
+			自动提现
+		</div>
+
+		<div class="input_panel">
+			<input type="radio" id="auto_withdraw_0" class="info_text_radio" name="auto_withdraw" value="0" checked>
+			<label for="huey">启用</label>
+		</div>
+
+		<div class="input_panel">
+			<input type="radio" id="auto_withdraw_1" class="info_text_radio" name="auto_withdraw" value="1">
+			<label for="dewey">禁用</label>
+		</div>
+
+		<div class="panel">
 			自动使用加成卡(推荐方案2)
 		</div>
 
@@ -282,7 +296,14 @@
 				$("#tg_api_key").val(data.tg_api_key);
 				$("#tg_chat_id").val(data.tg_chat_id);
 				$("#tg_proxy").val(data.tg_proxy);
+
+				if (!data.hasOwnProperty("auto_turbo"))
+					data.auto_turbo = 0;
 				$('input:radio[name=auto_turbo]')[data.auto_turbo].checked = true;
+
+				if (!data.hasOwnProperty("auto_withdraw"))
+					data.auto_withdraw = 0;
+				$('input:radio[name=auto_withdraw]')[data.auto_withdraw].checked = true;
 			}
 			);
 		}
@@ -353,6 +374,7 @@
 				c.tg_chat_id = $("#tg_chat_id").val().replace(/(^\s*)|(\s*$)/g,"");
 				c.tg_proxy = $("#tg_proxy").val().replace(/(^\s*)|(\s*$)/g,"");
 				c.auto_turbo = $('input:radio[name=auto_turbo]:checked').val();
+				c.auto_withdraw = $('input:radio[name=auto_withdraw]:checked').val();
 				$.post("save_info.cgi", JSON.stringify(c),
 					function (result) {
 						dlg.text(result.msg);

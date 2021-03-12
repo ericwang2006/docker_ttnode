@@ -108,52 +108,57 @@ withdraw() {
 	if [ "$token" = "null" ]; then
 		exit 2
 	fi
-	sleep300
-	text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
-	errCode=$(echo $text | jq '.errCode')
-	if [[ $errCode -ne 0 ]]; then
-		msg="token可能失效，请尝试重新登录。"
-		notify "$msg"
-		echo "$msg"
-		exit 3
-	fi
-	score=$(echo $text | jq -r '.data.score')
-	score=$(($score - $score % 100))
-	real_name=$(echo $text | jq -r '.data.zfbList[0].name')
-	card_id=$(echo $text | jq -r '.data.zfbList[0].account')
-	bank_name="支付宝"
-	sub_bank_name=""
-	type="zfb"
 
-	if [[ $score -lt 1000 ]]; then
-		d=$(date "+%Y-%m-%d %H:%M:%S")
-		m=$(echo -e "$d\n甜糖提现失败：星愿不足1000")
-	else
-		if [[ $score -gt 10000 ]]; then
-			score=9900
-		fi
-		text=$(
-			curl -s -X POST \
-				-H "authorization:$token" \
-				-H "Content-Type:application/x-www-form-urlencoded" \
-				--data-urlencode "score=$score" \
-				--data-urlencode "real_name=$real_name" \
-				--data-urlencode "card_id=$card_id" \
-				--data-urlencode "bank_name=$bank_name" \
-				--data-urlencode "sub_bank_name=$sub_bank_name" \
-				--data-urlencode "type=$type" \
-				"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
-		)
+	auto_withdraw=$(jq -r '.auto_withdraw' $cfile)
+	# 为0 或者为 null 启用自动提现
+	if [ "$auto_withdraw" = "null" ] || [ "$auto_withdraw" = "0" ]; then
+		sleep300
+		text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
 		errCode=$(echo $text | jq '.errCode')
-		d=$(date "+%Y-%m-%d %H:%M:%S")
-		if [[ $errCode -eq 0 ]]; then
-			m=$(echo -e "$d\n甜糖提现成功：扣除$score,支付宝$card_id")
-		else
-			m=$(echo -e "$d\n甜糖提现失败：$(echo $text | jq -r '.msg')")
+		if [[ $errCode -ne 0 ]]; then
+			msg="token可能失效，请尝试重新登录。"
+			notify "$msg"
+			echo "$msg"
+			exit 3
 		fi
+		score=$(echo $text | jq -r '.data.score')
+		score=$(($score - $score % 100))
+		real_name=$(echo $text | jq -r '.data.zfbList[0].name')
+		card_id=$(echo $text | jq -r '.data.zfbList[0].account')
+		bank_name="支付宝"
+		sub_bank_name=""
+		type="zfb"
+
+		if [[ $score -lt 1000 ]]; then
+			d=$(date "+%Y-%m-%d %H:%M:%S")
+			m=$(echo -e "$d\n甜糖提现失败：星愿不足1000")
+		else
+			if [[ $score -gt 10000 ]]; then
+				score=9900
+			fi
+			text=$(
+				curl -s -X POST \
+					-H "authorization:$token" \
+					-H "Content-Type:application/x-www-form-urlencoded" \
+					--data-urlencode "score=$score" \
+					--data-urlencode "real_name=$real_name" \
+					--data-urlencode "card_id=$card_id" \
+					--data-urlencode "bank_name=$bank_name" \
+					--data-urlencode "sub_bank_name=$sub_bank_name" \
+					--data-urlencode "type=$type" \
+					"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+			)
+			errCode=$(echo $text | jq '.errCode')
+			d=$(date "+%Y-%m-%d %H:%M:%S")
+			if [[ $errCode -eq 0 ]]; then
+				m=$(echo -e "$d\n甜糖提现成功：扣除$score,支付宝$card_id")
+			else
+				m=$(echo -e "$d\n甜糖提现失败：$(echo $text | jq -r '.msg')")
+			fi
+		fi
+		notify "$(escape "$m")"
+		echo "$m"
 	fi
-	notify "$(escape "$m")"
-	echo "$m"
 }
 
 notify() {
