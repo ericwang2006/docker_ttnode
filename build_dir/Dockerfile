@@ -2,6 +2,7 @@ FROM --platform=$TARGETPLATFORM debian:stable-slim AS builder
 
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
     apt-get update && \
     apt-get install build-essential git ca-certificates wget -y --no-install-recommends
 
@@ -39,8 +40,8 @@ ARG EMULATION_PLATFORM=arm32
 # start.sh用脚本监控ttnode进程,不用cron
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
     apt-get update && apt-get install openssl cron procps net-tools iputils-ping ca-certificates curl jq nano bc -y --no-install-recommends && \
-    update-ca-certificates && \
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo 'Asia/Shanghai' >/etc/timezone && \
