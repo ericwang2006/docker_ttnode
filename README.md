@@ -2,6 +2,17 @@
 
 <!--[![nodesource/node](http://dockeri.co/image/ericwang2006/ttnode)](https://hub.docker.com/r/ericwang2006/ttnode/)-->
 
+**特别说明**
+
+2021年3月19日官方升级了新版本（v194），使用之前的镜像会报错`sh: 1: /mnts/ipdbcf: Exec format error`，目前最新镜像已经做了针对性修改，但请知悉以下问题
+
+1. 这个错误目前只涉及x86架构设备，arm架构(玩客云,N1,树莓派等)设备不受影响。
+2. 这次修改后，要求宿主机系统支持binfmt_misc(注：大部分Openwrt系统没有打开binfmt_misc),不支持binfmt_misc的宿主机系统运行本docker容器,无法启动**ipdbcf**进程,脚本会在日志中提示并自动退出
+3. 容器启动后会自动注册qemu模拟器，**不需要**显示执行`docker run --rm --privileged multiarch/qemu-user-static --reset -p yes`了
+4. x86架构下，使用qemu模拟器运行ttnode非官方建议做法，不能保证完美运行，且用且珍惜。
+5. **ipdbcf**进程的作用目前尚不明确，为动态下载到/mnts目录，未监听任何端口，期待有大神指点迷津。
+6. 如果发现CUP占用较高，请尝试更新GMT+8 2021-03-20 9:00:00后的最新镜像，注意不要使用国内的docker的镜像服务器(缓存更新缓慢，不能保证下载到的是最新版本)，如果无法拉取最新版本可以尝试我发布的离线镜像 https://wws.lanzous.com/b01zvsbwj 密码:h92y
+
 # 甜糖星愿镜像
 
 - 基于debian:stable-slim构建
@@ -177,7 +188,7 @@ docker exec -it ttnode /bin/bash
 	这个问题目前有了最新**进展**，经过多次测试发现ttnode的uid和以下因素同时相关
 	- **hostname**
 	- **网卡的mac地址**
- 
+
 	由于此前创建docker容器时并未指定hostname，所以每次创建容器都是随机的hostname，导致出现了随机的uid，目前已经修改了相关示例代码，创建容器时指定了hostname
 
 - ~~在x86架构下，UPnP功能无效，需要手动在路由器上做端口转发~~
