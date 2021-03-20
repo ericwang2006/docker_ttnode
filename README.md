@@ -2,6 +2,9 @@
 
 <!--[![nodesource/node](http://dockeri.co/image/ericwang2006/ttnode)](https://hub.docker.com/r/ericwang2006/ttnode/)-->
 
+# X86架构下的镜像，CPU和内存占用高的问题仍未解决，请大家慎用，ARM架构下的镜像不受影响
+---
+
 **特别说明**
 
 2021年3月19日官方升级了新版本（v194），使用之前的镜像会报错`sh: 1: /mnts/ipdbcf: Exec format error`，目前最新镜像已经做了针对性修改，但请知悉以下问题
