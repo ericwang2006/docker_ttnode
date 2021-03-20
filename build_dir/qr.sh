@@ -1,11 +1,10 @@
 #!/bin/bash
 case "$(uname -m)" in
 x86_64)
-	# qemu="/usr/bin/qemu-arm-static"
-	# if [ ! -f "$qemu" ]; then
-	# qemu="/usr/bin/qemu-aarch64-static"
-	# fi
-	qemu=""
+	qemu="/usr/bin/qemu-arm-static"
+	if [ ! -f "$qemu" ]; then
+		qemu="/usr/bin/qemu-aarch64-static"
+	fi
 	;;
 aarch64)
 	qemu=""

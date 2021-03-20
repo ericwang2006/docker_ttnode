@@ -52,15 +52,26 @@ fi
 
 arch=$(uname -m)
 if [ $arch = "x86_64" ]; then
-	if [ -d "/proc/sys/fs/binfmt_misc" ]; then
-		if [ ! -f "/proc/sys/fs/binfmt_misc/qemu-arm" ]; then
-			/usr/node/qemu-binfmt-conf.sh --qemu-path /usr/bin --qemu-suffix -static >/dev/null 2>&1
-		fi
-	else
-		d=$(date '+%F %T')
-		echo "[$d] 当前宿主机系统不支持binfmt_misc,新版甜糖(v194+)不能正常运行(注:大部分openwrt系统未开启binfmt_misc)"
-		exit 2
+	ipdbcf="/usr/node/.ipdbcf"
+	if [ ! -f "$ipdbcf" ]; then
+		cat >$ipdbcf <<EOF
+#!/bin/bash
+echo "ipdbcf"
+EOF
+		chmod +x $ipdbcf
 	fi
+	touch /mnts/ipdbcf
+	mount -B $ipdbcf /mnts/ipdbcf
+
+	# if [ -d "/proc/sys/fs/binfmt_misc" ]; then
+	# if [ ! -f "/proc/sys/fs/binfmt_misc/qemu-arm" ]; then
+	# /usr/node/qemu-binfmt-conf.sh --qemu-path /usr/bin --qemu-suffix -static >/dev/null 2>&1
+	# fi
+	# else
+	# d=$(date '+%F %T')
+	# echo "[$d] 当前宿主机系统不支持binfmt_misc,新版甜糖(v194+)不能正常运行(注:大部分openwrt系统未开启binfmt_misc)"
+	# exit 2
+	# fi
 fi
 
 foundport=0
@@ -73,11 +84,10 @@ while true; do
 		echo "[$d] ttnode进程不存在,启动ttnode"
 		case "$arch" in
 		x86_64)
-			# qemu="/usr/bin/qemu-arm-static"
-			# if [ ! -f "$qemu" ]; then
-			# qemu="/usr/bin/qemu-aarch64-static"
-			# fi
-			qemu=""
+			qemu="/usr/bin/qemu-arm-static"
+			if [ ! -f "$qemu" ]; then
+				qemu="/usr/bin/qemu-aarch64-static"
+			fi
 			;;
 		aarch64)
 			qemu=""
