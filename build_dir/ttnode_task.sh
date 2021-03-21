@@ -45,11 +45,11 @@ function create_config_file() {
 function login() {
 	read -p "请输入手机号码：" tel
 	if [ ${#tel} = 11 ]; then
-		codeText=$(curl -s -X POST https://tiantang.mogencloud.com/web/api/login/code?phone=$tel | jq '.errCode')
+		codeText=$(curl -s -k -X POST https://tiantang.mogencloud.com/web/api/login/code?phone=$tel | jq '.errCode')
 		if [ $codeText = 0 ]; then
 			read -p "验证码发送成功，请输入：" code
 			if [ ${#code} = 6 ]; then
-				tokenText=$(curl -s -X POST https://tiantang.mogencloud.com/web/api/login?phone=$tel\&authCode=$code | jq -r '.data.token')
+				tokenText=$(curl -s -k -X POST https://tiantang.mogencloud.com/web/api/login?phone=$tel\&authCode=$code | jq -r '.data.token')
 				if [ $tokenText = null ]; then
 					echo "登录失败，请重试！"
 				else
@@ -113,7 +113,7 @@ withdraw() {
 	# 为0 或者为 null 启用自动提现
 	if [ "$auto_withdraw" = "null" ] || [ "$auto_withdraw" = "0" ]; then
 		sleep300
-		text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
+		text=$(curl -k -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
 		errCode=$(echo $text | jq '.errCode')
 		if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 			msg="token可能失效，请尝试重新登录。"
@@ -137,7 +137,7 @@ withdraw() {
 				score=9900
 			fi
 			text=$(
-				curl -s -X POST \
+				curl -s -k -X POST \
 					-H "authorization:$token" \
 					-H "Content-Type:application/x-www-form-urlencoded" \
 					--data-urlencode "score=$score" \
@@ -168,9 +168,9 @@ notify() {
 	if [ -n "$sckey" ]; then
 		desp=$(echo "$1" | sed ":a;N;s/\n/#LF/g;ta" | sed "s/#LF/\n\n/g" | sed "s/\*/\*\*/g")
 		if [[ $sckey == SCT* ]]; then #$sckey以SCT开头(Turbo版)
-			curl -s -X POST -d "title=甜糖日报&desp=$desp" https://sctapi.ftqq.com/$sckey.send >/dev/null 2>&1
+			curl -s -k -X POST -d "title=甜糖日报&desp=$desp" https://sctapi.ftqq.com/$sckey.send >/dev/null 2>&1
 		else
-			curl -s -X POST -d "text=甜糖日报&desp=$desp" https://sc.ftqq.com/$sckey.send >/dev/null 2>&1
+			curl -s -k -X POST -d "text=甜糖日报&desp=$desp" https://sc.ftqq.com/$sckey.send >/dev/null 2>&1
 		fi
 	fi
 
@@ -183,9 +183,9 @@ notify() {
 		data=$(jq -n -c -M --arg v1 "$tg_chat_id" --arg v2 "$desp" '{"disable_web_page_preview":false, "parse_mode":"markdown", "chat_id":$v1, "text":$v2}')
 
 		if [ -n "$tg_proxy" ]; then
-			curl -s -X "POST" -H 'Content-Type: application/json' -x $tg_proxy -d "$data" "https://api.telegram.org/bot$tg_api_key/sendMessage" >/dev/null 2>&1
+			curl -s -k -X "POST" -H 'Content-Type: application/json' -x $tg_proxy -d "$data" "https://api.telegram.org/bot$tg_api_key/sendMessage" >/dev/null 2>&1
 		else
-			curl -s -X "POST" -H 'Content-Type: application/json' -d "$data" "https://api.telegram.org/bot$tg_api_key/sendMessage" >/dev/null 2>&1
+			curl -s -k -X "POST" -H 'Content-Type: application/json' -d "$data" "https://api.telegram.org/bot$tg_api_key/sendMessage" >/dev/null 2>&1
 		fi
 	fi
 }
@@ -241,7 +241,7 @@ report() {
 		exit 2
 	fi
 	sleep300
-	text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
+	text=$(curl -k -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
@@ -260,10 +260,10 @@ report() {
 	echo "今日推广星愿：*$inactivedPromoteScore*" >>$mfile
 	total=$((total + inactivedPromoteScore))
 	if [[ $inactivedPromoteScore -gt 0 ]]; then
-		curl -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore" >/dev/null 2>&1
+		curl -k -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore" >/dev/null 2>&1
 	fi
 	#签到
-	sign_result=$(curl -s -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/sign_in)
+	sign_result=$(curl -s -k -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/sign_in)
 	sign_errCode=$(echo $sign_result | jq '.errCode')
 	sign_msg=$(echo $sign_result | jq -r '.msg')
 	sign_data=$(echo $sign_result | jq -r '.data')
@@ -275,7 +275,7 @@ report() {
 	fi
 
 	echo "设备星愿详情：" >>$mfile
-	text=$(curl -s -X GET -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/devices?page=1&type=2&per_page=64")
+	text=$(curl -s -k -X GET -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/devices?page=1&type=2&per_page=64")
 	devList=$(echo $text | jq '.data.data')
 	max_device_index=$(echo $text | jq '.data.data|length'-1)
 	for index in $(seq 0 $max_device_index); do
@@ -283,7 +283,7 @@ report() {
 		alias=$(echo $devList | jq -r ".[$index].alias")
 		devSore=$(echo $devList | jq ".[$index].inactived_score")
 		if [[ $devSore -gt 0 ]]; then
-			curl -s -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore" >/dev/null 2>&1
+			curl -s -k -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore" >/dev/null 2>&1
 			total=$((total + devSore))
 		fi
 		echo "【$alias】星愿：*$devSore*" >>$mfile
@@ -315,7 +315,7 @@ auto_turbo() {
 
 	sleep300
 	# 获取加成卡信息
-	text=$(curl -X GET -H "authorization:$token" -s https://tiantang.mogencloud.com/api/v1/user_props)
+	text=$(curl -k -X GET -H "authorization:$token" -s https://tiantang.mogencloud.com/api/v1/user_props)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
@@ -352,7 +352,7 @@ auto_turbo() {
 	done
 	# 使用 遍历出来的最高加速卡
 	if [ "$current_id" != "unknown" ]; then
-		curl -s -X PUT -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/user_props/$current_id/actived" >/dev/null 2>&1
+		curl -s -k -X PUT -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/user_props/$current_id/actived" >/dev/null 2>&1
 		echo "*已自动使用：$current_name*" >>$mfile
 	else
 		echo "*错误 ：$current_name*" >>$mfile
@@ -364,7 +364,7 @@ auto_turbo() {
 update() {
 	sleep300
 	tmpfile="/tmp/.ttnode_task.sh"
-	echo "开始升级..." && curl -s -o "$tmpfile" https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/build_dir/ttnode_task.sh && cp "$0" "$0.bak" && mv "$tmpfile" $0 && chmod +x $0 && echo "升级成功"
+	echo "开始升级..." && curl -s -k -o "$tmpfile" https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/build_dir/ttnode_task.sh && cp "$0" "$0.bak" && mv "$tmpfile" $0 && chmod +x $0 && echo "升级成功"
 }
 
 main() {
