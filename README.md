@@ -2,19 +2,26 @@
 
 <!--[![nodesource/node](http://dockeri.co/image/ericwang2006/ttnode)](https://hub.docker.com/r/ericwang2006/ttnode/)-->
 
-# X86架构下的镜像，CPU和内存占用高的问题仍未解决，请大家慎用，ARM架构下的镜像不受影响
----
-
 **特别说明**
 
 2021年3月19日官方升级了新版本（v194），使用之前的镜像会报错`sh: 1: /mnts/ipdbcf: Exec format error`，目前最新镜像已经做了针对性修改，但请知悉以下问题
 
 1. 这个错误目前只涉及x86架构设备，arm架构(玩客云,N1,树莓派等)设备不受影响。
-2. 这次修改后，要求宿主机系统支持binfmt_misc(注：大部分Openwrt系统没有打开binfmt_misc),不支持binfmt_misc的宿主机系统运行本docker容器,无法启动**ipdbcf**进程,脚本会在日志中提示并自动退出
-3. 容器启动后会自动注册qemu模拟器，**不需要**显示执行`docker run --rm --privileged multiarch/qemu-user-static --reset -p yes`了
-4. x86架构下，使用qemu模拟器运行ttnode非官方建议做法，不能保证完美运行，且用且珍惜。
-5. **ipdbcf**进程的作用目前尚不明确，为动态下载到/mnts目录，未监听任何端口，期待有大神指点迷津。
-6. 如果发现CUP占用较高，请尝试更新GMT+8 2021-03-20 9:00:00后的最新镜像，注意不要使用国内的docker的镜像服务器(缓存更新缓慢，不能保证下载到的是最新版本)，如果无法拉取最新版本可以尝试我发布的离线镜像 https://wws.lanzous.com/b01zvsbwj 密码:h92y
+
+2. 请尝试更新**GMT+8 2021-03-21 10:00:00**后的最新镜像，注意不要使用国内的docker的镜像服务器(缓存更新缓慢，不能保证下载到的是最新版本)，如果无法拉取最新版本可以尝试我发布的离线镜像 https://wws.lanzous.com/b01zvsbwj 密码:h92y
+
+3. 关于x86架构镜像长时间运行后CPU和内存占用过高的说明
+
+   一句话，都是ipdbcf惹的祸。
+
+   - ipdbcf的作用目前尚不明确，由ttnode进程动态下载到/mnts目录并启动，未监听任何端口
+
+   - ttnode进程每分钟会检查一次ipdbcf进程是否存在，如果没有会尝试启动
+   - 在arm架构下ipdbcf进程只会启动一个，不会占用过多资源
+   - 在x86架构下，使用qemu模拟器运行，ttnode似乎不能判断ipdbcf进程是否存在，所以会不断启动新的ipdbcf进程（猜测）
+   - 目前暂时用了点雕虫小技把ipdbcf禁用了，**副作用尚不明确**
+   - x86架构下，使用qemu模拟器运行ttnode非官方建议做法，**不能保证完美运行**，且用且珍惜
+   - 也希望官方尽早推出x86原生程序，x86设备众多，性能和稳定性都有一定优势
 
 # 甜糖星愿镜像
 
