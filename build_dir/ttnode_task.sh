@@ -115,7 +115,7 @@ withdraw() {
 		sleep300
 		text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
 		errCode=$(echo $text | jq '.errCode')
-		if [[ $errCode -ne 0 ]]; then
+		if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 			msg="token可能失效，请尝试重新登录。"
 			notify "$msg"
 			echo "$msg"
@@ -243,7 +243,7 @@ report() {
 	sleep300
 	text=$(curl -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
 	errCode=$(echo $text | jq '.errCode')
-	if [[ $errCode -ne 0 ]]; then
+	if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
 		notify "$msg"
 		echo "$msg"
@@ -317,7 +317,7 @@ auto_turbo() {
 	# 获取加成卡信息
 	text=$(curl -X GET -H "authorization:$token" -s https://tiantang.mogencloud.com/api/v1/user_props)
 	errCode=$(echo $text | jq '.errCode')
-	if [[ $errCode -ne 0 ]]; then
+	if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
 		notify "$msg"
 		echo "$msg"
