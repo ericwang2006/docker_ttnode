@@ -54,14 +54,11 @@ arch=$(uname -m)
 if [ $arch = "x86_64" ]; then
 	ipdbcf="/usr/node/.ipdbcf"
 	if [ ! -f "$ipdbcf" ]; then
-		cat >$ipdbcf <<EOF
-#!/bin/bash
-echo "ipdbcf"
-EOF
+		echo -e "#!/bin/bash\necho \$@" >$ipdbcf
 		chmod +x $ipdbcf
 	fi
-	touch /mnts/ipdbcf
-	mount -B $ipdbcf /mnts/ipdbcf
+	echo -e "#!/bin/bash\necho ipdbcf" >/mnts/ipdbcf && chmod +x /mnts/ipdbcf
+	mount --bind $ipdbcf /mnts/ipdbcf >/dev/null 2>&1
 
 	# if [ -d "/proc/sys/fs/binfmt_misc" ]; then
 	# if [ ! -f "/proc/sys/fs/binfmt_misc/qemu-arm" ]; then
