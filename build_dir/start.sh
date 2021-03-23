@@ -52,6 +52,10 @@ fi
 
 arch=$(uname -m)
 if [ $arch = "x86_64" ]; then
+	if [ ! -f "/usr/bin/killall" ]; then
+		echo '#!/bin/bash' >/usr/bin/killall && chmod +x /usr/bin/killall
+	fi
+
 	ipdbcf="/usr/node/.ipdbcf"
 	if [ ! -f "$ipdbcf" ]; then
 		echo -e "#!/bin/bash\necho \$@" >$ipdbcf
