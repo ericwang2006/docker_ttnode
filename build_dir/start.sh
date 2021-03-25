@@ -47,7 +47,8 @@ if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 fi
 
 if [[ $DISABLE_CONTROL_PANEL != "1" ]]; then
-	/usr/node/thttpd -u root -p 1043 -d /usr/node/htdocs -c "**.cgi"
+	# /usr/node/thttpd -u root -p 1043 -d /usr/node/htdocs -c "**.cgi"
+	/usr/node/shttpd -root /usr/node/htdocs -ports 1043 &
 fi
 
 arch=$(uname -m)
@@ -61,6 +62,27 @@ if [ $arch = "x86_64" ]; then
 		echo -e "#!/bin/bash\necho \$@" >$ipdbcf
 		chmod +x $ipdbcf
 	fi
+
+	# if [[ $KEEP_ONE_IPDBCF != "True" ]]; then
+	# bin_ipdbcf="/mnts/.ipdbcf/ipdbcf"
+	# if [ ! -f "$bin_ipdbcf" ]; then
+	# mkdir -p /mnts/.ipdbcf
+	# curl -L -k -o $bin_ipdbcf.down https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/$(uname -m)/ipdbcf && mv $bin_ipdbcf.down $bin_ipdbcf && chmod +x $bin_ipdbcf
+	# if [ $? -eq 0 ]; then
+	# qemu="/usr/bin/qemu-arm-static"
+	# if [ ! -f "$qemu" ]; then
+	# qemu="/usr/bin/qemu-aarch64-static"
+	# fi
+	# echo '#!/bin/bash' >$ipdbcf
+	# echo "num=\$(ps fax | grep '$bin_ipdbcf' | egrep -v 'grep|echo|rpm|moni|guard' | wc -l)" >>$ipdbcf
+	# echo 'if [ $num -lt 1 ]; then' >>$ipdbcf
+	# echo "	$qemu $bin_ipdbcf \$@" >>$ipdbcf
+	# echo 'fi' >>$ipdbcf
+	# chmod +x $ipdbcf
+	# fi
+	# fi
+	# fi
+
 	echo -e "#!/bin/bash\necho ipdbcf" >/mnts/ipdbcf && chmod +x /mnts/ipdbcf
 	mount --bind $ipdbcf /mnts/ipdbcf >/dev/null 2>&1
 

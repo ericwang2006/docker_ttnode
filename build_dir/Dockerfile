@@ -7,11 +7,17 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     apt-get install build-essential git ca-certificates wget -y --no-install-recommends
 
 # http://www.acme.com/software/thttpd/
-RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
-    tar -zxvf ./thttpd-2.29.tar.gz && \
-    cd thttpd-2.29 && \
-    ./configure && \
-    make
+# RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
+#    tar -zxvf ./thttpd-2.29.tar.gz && \
+#    cd thttpd-2.29 && \
+#    ./configure && \
+#    make
+
+# https://sourceforge.net/projects/shttpd/files/shttpd/1.42/
+RUN wget -O ./shttpd-1.42.tar.gz https://github.com/ericwang2006/shttpd/archive/refs/tags/v1.42.tar.gz && \
+   tar -zxvf ./shttpd-1.42.tar.gz && \
+   cd shttpd-1.42/src && \
+   LIBS="-lpthread -ldl " make unix
 
 FROM --platform=$TARGETPLATFORM debian:stable-slim
 
@@ -48,7 +54,7 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     rm -rf /var/lib/apt/lists/*
 
 COPY . /usr/node/
-COPY --from=builder /thttpd-2.29/thttpd /usr/node/
+COPY --from=builder /shttpd-1.42/src/shttpd /usr/node/
 RUN /usr/node/init_arch.sh && rm /usr/node/init_arch.sh && rm /usr/node/Dockerfile
 
 WORKDIR /usr/node
