@@ -47,7 +47,7 @@ ARG EMULATION_PLATFORM=arm32
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
-    apt-get update && apt-get install openssl cron procps net-tools iputils-ping ca-certificates curl jq nano bc -y --no-install-recommends && \
+    apt-get update && apt-get install openssl cron procps net-tools iputils-ping ca-certificates curl jq nano bc psmisc -y --no-install-recommends && \
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo 'Asia/Shanghai' >/etc/timezone && \

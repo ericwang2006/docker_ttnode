@@ -4,6 +4,8 @@
 
 **特别说明**
 
+2021年3月30日测试，ipdbcf文件已经不会自动自动下载并运行了，新版本镜像默认将不再处理ipdbcf的行为，如果需要，请参看环境变量DISABLE_IPDBCF。
+
 2021年3月19日官方升级了新版本（v194），使用之前的镜像会报错`sh: 1: /mnts/ipdbcf: Exec format error`，目前最新镜像已经做了针对性修改，但请知悉以下问题
 
 1. 这个错误目前只涉及x86架构设备，arm架构(玩客云,N1,树莓派等)设备不受影响。
@@ -137,10 +139,11 @@ docker exec -it ttnode /bin/bash
 
 ## 环境变量
 
-|名称|说明|1|非1
-| :--- | :--- | :--- | :--- |
-|DISABLE_ATUO_TASK|自动收星愿|禁用|启用
-|DISABLE_CONTROL_PANEL|控制面板|禁用|启用
+| 名称 | | 值 | 说明 | 值 | 说明 |
+| :--- | --- | ---- | :--- | :--- | :--- |
+| DISABLE_ATUO_TASK | 自动收星愿 | 1 | 禁用 | 非1 | 启用 |
+| DISABLE_CONTROL_PANEL | 控制面板 | 1 | 禁用 | 非1 | 启用 |
+| DISABLE_IPDBCF | 禁用ipdbcf进程 | 1 | 禁用ipdbcf进程 | 非1 | 不做任何处理 |
 
 ## FAQ
 1. 怎么多开?
