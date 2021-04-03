@@ -176,7 +176,7 @@ docker exec -it ttnode /bin/bash
 
 ## 已知问题
 
-- 日志中会提示**cannot create /proc/sys/net/core/wmem_max: Directory nonexistent**，是因为在daocker中不能设置Linux内核参数，不影响使用
+- 日志中会提示**cannot create /proc/sys/net/core/wmem_max: Directory nonexistent**，是因为在docker中不能设置Linux内核参数，不影响使用
 - ~~docker中ttnode第一次启动后大约20秒后有自动退出的概率，不用理会，脚本会再次启动ttnode~~(这是由于ttnode自动升级导致的)
 
 ```
