@@ -123,37 +123,79 @@ withdraw() {
 		fi
 		score=$(echo $text | jq -r '.data.score')
 		score=$(($score - $score % 100))
-		real_name=$(echo $text | jq -r '.data.zfbList[0].name')
-		card_id=$(echo $text | jq -r '.data.zfbList[0].account')
-		bank_name="支付宝"
-		sub_bank_name=""
-		type="zfb"
 
 		if [[ $score -lt 1000 ]]; then
 			d=$(date "+%Y-%m-%d %H:%M:%S")
 			m=$(echo -e "$d\n甜糖提现失败：星愿不足1000")
 		else
-			if [[ $score -gt 10000 ]]; then
-				score=9900
-			fi
-			text=$(
-				curl -s -k -X POST \
-					-H "authorization:$token" \
-					-H "Content-Type:application/x-www-form-urlencoded" \
-					--data-urlencode "score=$score" \
-					--data-urlencode "real_name=$real_name" \
-					--data-urlencode "card_id=$card_id" \
-					--data-urlencode "bank_name=$bank_name" \
-					--data-urlencode "sub_bank_name=$sub_bank_name" \
-					--data-urlencode "type=$type" \
-					"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
-			)
-			errCode=$(echo $text | jq '.errCode')
-			d=$(date "+%Y-%m-%d %H:%M:%S")
-			if [[ $errCode -eq 0 ]]; then
-				m=$(echo -e "$d\n甜糖提现成功：扣除$score,支付宝$card_id")
+			isEContract=$(echo $text | jq .data.isEContract)
+			if [ $isEContract = "true" ]; then
+				#已签电子合同
+				bankCardCount=$(echo $text | jq '.data.bankCardList|length')
+				if [[ $bankCardCount -eq 0 ]]; then
+					d=$(date "+%Y-%m-%d %H:%M:%S")
+					m=$(echo -e "$d\n银行卡提现失败，原因是未绑定银行卡")
+				else
+					real_name=$(echo $text | jq -r '.data.bankCardList[0].name')
+					card_id=$(echo $text | jq -r '.data.bankCardList[0].bankCardNum')
+					bank_name=$(echo $text | jq -r '.data.bankCardList[0].bankName')
+					sub_bank_name=$(echo $text | jq -r '.data.bankCardList[0].subBankName')
+					type="bank_card"
+					text=$(
+						curl -s -k -X POST \
+							-H "authorization:$token" \
+							-H "Content-Type:application/x-www-form-urlencoded" \
+							--data-urlencode "score=$score" \
+							--data-urlencode "real_name=$real_name" \
+							--data-urlencode "card_id=$card_id" \
+							--data-urlencode "bank_name=$bank_name" \
+							--data-urlencode "sub_bank_name=$sub_bank_name" \
+							--data-urlencode "type=$type" \
+							"https://tiantang.mogencloud.com/api/v2/withdraw_logs"
+					)
+					errCode=$(echo $text | jq '.errCode')
+					d=$(date "+%Y-%m-%d %H:%M:%S")
+					if [[ $errCode -eq 0 ]]; then
+						m=$(echo -e "$d\n甜糖提现成功：扣除$score,银行卡$card_id")
+					else
+						m=$(echo -e "$d\n甜糖提现失败：$(echo $text | jq -r '.msg')")
+					fi
+				fi
 			else
-				m=$(echo -e "$d\n甜糖提现失败：$(echo $text | jq -r '.msg')")
+				#未签电子合同,使用支付宝提现
+				zfbCount=$(echo $text | jq '.data.zfbList|length')
+				if [[ $zfbCount -eq 0 ]]; then
+					d=$(date "+%Y-%m-%d %H:%M:%S")
+					m=$(echo -e "$d\n支付宝提现失败，原因是未绑定支付宝")
+				else
+					real_name=$(echo $text | jq -r '.data.zfbList[0].name')
+					card_id=$(echo $text | jq -r '.data.zfbList[0].account')
+					bank_name="支付宝"
+					sub_bank_name=""
+					type="zfb"
+					if [[ $score -gt 10000 ]]; then
+						score=9900
+					fi
+					text=$(
+						curl -s -k -X POST \
+							-H "authorization:$token" \
+							-H "Content-Type:application/x-www-form-urlencoded" \
+							--data-urlencode "score=$score" \
+							--data-urlencode "real_name=$real_name" \
+							--data-urlencode "card_id=$card_id" \
+							--data-urlencode "bank_name=$bank_name" \
+							--data-urlencode "sub_bank_name=$sub_bank_name" \
+							--data-urlencode "type=$type" \
+							"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+					)
+					errCode=$(echo $text | jq '.errCode')
+					d=$(date "+%Y-%m-%d %H:%M:%S")
+					if [[ $errCode -eq 0 ]]; then
+						m=$(echo -e "$d\n甜糖提现成功：扣除$score,支付宝$card_id")
+					else
+						m=$(echo -e "$d\n甜糖提现失败：$(echo $text | jq -r '.msg')")
+					fi
+				fi
 			fi
 		fi
 		notify "$(escape "$m")"
