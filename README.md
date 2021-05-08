@@ -192,7 +192,6 @@ docker exec -it ttnode /bin/bash
 
 - ericwang2006/ttnode:x86_arm64这个镜像是x86架构下模拟arm64，据说这种模式效率高，我还没有很好的方法测试，UPnP是确定不支持，其它问题未知，不建议普通用户碰
 
-- 爱快的docker插件不能获取足够权限，无法支持（主要是因为作者水平太差）
 
 **特别说明**
 
