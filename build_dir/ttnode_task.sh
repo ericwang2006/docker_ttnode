@@ -10,6 +10,9 @@ else
 	CONFIG_DIR=$(dirname $0)
 fi
 
+# https协议接口目前不可用,暂时用http协议
+PROTOCOL="http"
+
 function sleep300() {
 	seconds_left=$((RANDOM % 300 + 1))
 	echo "错峰延时执行$seconds_left秒，请耐心等待"
@@ -45,11 +48,11 @@ function create_config_file() {
 function login() {
 	read -p "请输入手机号码：" tel
 	if [ ${#tel} = 11 ]; then
-		codeText=$(curl -s -k -X POST https://tiantang.mogencloud.com/web/api/login/code?phone=$tel | jq '.errCode')
+		codeText=$(curl -s -k -X POST $PROTOCOL://tiantang.mogencloud.com/web/api/login/code?phone=$tel | jq '.errCode')
 		if [ $codeText = 0 ]; then
 			read -p "验证码发送成功，请输入：" code
 			if [ ${#code} = 6 ]; then
-				tokenText=$(curl -s -k -X POST https://tiantang.mogencloud.com/web/api/login?phone=$tel\&authCode=$code | jq -r '.data.token')
+				tokenText=$(curl -s -k -X POST $PROTOCOL://tiantang.mogencloud.com/web/api/login?phone=$tel\&authCode=$code | jq -r '.data.token')
 				if [ $tokenText = null ]; then
 					echo "登录失败，请重试！"
 				else
@@ -113,7 +116,7 @@ withdraw() {
 	# 为0 或者为 null 启用自动提现
 	if [ "$auto_withdraw" = "null" ] || [ "$auto_withdraw" = "0" ]; then
 		sleep300
-		text=$(curl -k -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
+		text=$(curl -k -X POST -H "authorization:$token" -s $PROTOCOL://tiantang.mogencloud.com/web/api/account/message/loading)
 		errCode=$(echo $text | jq '.errCode')
 		if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 			msg="token可能失效，请尝试重新登录。"
@@ -151,7 +154,7 @@ withdraw() {
 							--data-urlencode "bank_name=$bank_name" \
 							--data-urlencode "sub_bank_name=$sub_bank_name" \
 							--data-urlencode "type=$type" \
-							"https://tiantang.mogencloud.com/api/v2/withdraw_logs"
+							"$PROTOCOL://tiantang.mogencloud.com/api/v2/withdraw_logs"
 					)
 					errCode=$(echo $text | jq '.errCode')
 					d=$(date "+%Y-%m-%d %H:%M:%S")
@@ -186,7 +189,7 @@ withdraw() {
 							--data-urlencode "bank_name=$bank_name" \
 							--data-urlencode "sub_bank_name=$sub_bank_name" \
 							--data-urlencode "type=$type" \
-							"https://tiantang.mogencloud.com/api/v1/withdraw_logs"
+							"$PROTOCOL://tiantang.mogencloud.com/api/v1/withdraw_logs"
 					)
 					errCode=$(echo $text | jq '.errCode')
 					d=$(date "+%Y-%m-%d %H:%M:%S")
@@ -283,7 +286,7 @@ report() {
 		exit 2
 	fi
 	sleep300
-	text=$(curl -k -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/message/loading)
+	text=$(curl -k -X POST -H "authorization:$token" -s $PROTOCOL://tiantang.mogencloud.com/web/api/account/message/loading)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
@@ -302,10 +305,10 @@ report() {
 	echo "今日推广星愿：*$inactivedPromoteScore*" >>$mfile
 	total=$((total + inactivedPromoteScore))
 	if [[ $inactivedPromoteScore -gt 0 ]]; then
-		curl -k -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore" >/dev/null 2>&1
+		curl -k -X POST -H "authorization:$token" -s "$PROTOCOL://tiantang.mogencloud.com/api/v1/promote/score_logs?score=$inactivedPromoteScore" >/dev/null 2>&1
 	fi
 	#签到
-	sign_result=$(curl -s -k -X POST -H "authorization:$token" -s https://tiantang.mogencloud.com/web/api/account/sign_in)
+	sign_result=$(curl -s -k -X POST -H "authorization:$token" -s $PROTOCOL://tiantang.mogencloud.com/web/api/account/sign_in)
 	sign_errCode=$(echo $sign_result | jq '.errCode')
 	sign_msg=$(echo $sign_result | jq -r '.msg')
 	sign_data=$(echo $sign_result | jq -r '.data')
@@ -317,7 +320,7 @@ report() {
 	fi
 
 	echo "设备星愿详情：" >>$mfile
-	text=$(curl -s -k -X GET -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/devices?page=1&type=2&per_page=64")
+	text=$(curl -s -k -X GET -H "authorization:$token" -s "$PROTOCOL://tiantang.mogencloud.com/api/v1/devices?page=1&type=2&per_page=64")
 	devList=$(echo $text | jq '.data.data')
 	max_device_index=$(echo $text | jq '.data.data|length'-1)
 	for index in $(seq 0 $max_device_index); do
@@ -325,7 +328,7 @@ report() {
 		alias=$(echo $devList | jq -r ".[$index].alias")
 		devSore=$(echo $devList | jq ".[$index].inactived_score")
 		if [[ $devSore -gt 0 ]]; then
-			curl -s -k -X POST -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore" >/dev/null 2>&1
+			curl -s -k -X POST -H "authorization:$token" -s "$PROTOCOL://tiantang.mogencloud.com/api/v1/score_logs?device_id=$devId&score=$devSore" >/dev/null 2>&1
 			total=$((total + devSore))
 		fi
 		echo "【$alias】星愿：*$devSore*" >>$mfile
@@ -357,7 +360,7 @@ auto_turbo() {
 
 	sleep300
 	# 获取加成卡信息
-	text=$(curl -k -X GET -H "authorization:$token" -s https://tiantang.mogencloud.com/api/v1/user_props)
+	text=$(curl -k -X GET -H "authorization:$token" -s $PROTOCOL://tiantang.mogencloud.com/api/v1/user_props)
 	errCode=$(echo $text | jq '.errCode')
 	if [[ -z $errCode ]] || [[ $errCode -ne 0 ]]; then
 		msg="token可能失效，请尝试重新登录。"
@@ -394,7 +397,7 @@ auto_turbo() {
 	done
 	# 使用 遍历出来的最高加速卡
 	if [ "$current_id" != "unknown" ]; then
-		curl -s -k -X PUT -H "authorization:$token" -s "https://tiantang.mogencloud.com/api/v1/user_props/$current_id/actived" >/dev/null 2>&1
+		curl -s -k -X PUT -H "authorization:$token" -s "$PROTOCOL://tiantang.mogencloud.com/api/v1/user_props/$current_id/actived" >/dev/null 2>&1
 		echo "*已自动使用：$current_name*" >>$mfile
 	else
 		echo "*错误 ：$current_name*" >>$mfile

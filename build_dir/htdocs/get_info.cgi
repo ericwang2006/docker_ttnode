@@ -1,4 +1,7 @@
 #!/bin/bash
+
+PROTOCOL="http"
+
 function create_config_file() {
 	if [ ! -f "$1" ]; then
 		echo '{}' >$1
@@ -38,10 +41,10 @@ case $FORM_m in
 	cat $CONFIG_FILE
 	;;
 3)
-	curl -s -k -X POST "https://tiantang.mogencloud.com/web/api/login/code?phone=$FORM_phone"
+	curl -s -k -X POST "$PROTOCOL://tiantang.mogencloud.com/web/api/login/code?phone=$FORM_phone"
 	;;
 4)
-	tokenText=$(curl -s -k -X POST https://tiantang.mogencloud.com/web/api/login?phone=$FORM_tel\&authCode=$FORM_code | jq -r '.data.token')
+	tokenText=$(curl -s -k -X POST $PROTOCOL://tiantang.mogencloud.com/web/api/login?phone=$FORM_tel\&authCode=$FORM_code | jq -r '.data.token')
 	if [ $tokenText = null ]; then
 		echo '{"errCode": 1 , "msg":"登录失败，请重试！"}'
 	else
