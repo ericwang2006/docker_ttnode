@@ -408,6 +408,9 @@ auto_turbo() {
 
 update() {
 	sleep300
+	if [ `grep -c "https://tiantang" /usr/node/htdocs/get_info.cgi` -ne '0' ];then
+		sed -i "s/https:\/\/tiantang/http:\/\/tiantang/g" /usr/node/htdocs/get_info.cgi
+	fi
 	tmpfile="/tmp/.ttnode_task.sh"
 	echo "开始升级..." && curl -s -k -o "$tmpfile" https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/build_dir/ttnode_task.sh && cp "$0" "$0.bak" && mv "$tmpfile" $0 && chmod +x $0 && echo "升级成功"
 }
