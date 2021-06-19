@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/docker/stars/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/pulls/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/image-size/ericwang2006/ttnode/latest"/>
+<img src="https://img.shields.io/docker/stars/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/pulls/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/image-size/ericwang2006/ttnode/alpine"/>
 
 <!--[![nodesource/node](http://dockeri.co/image/ericwang2006/ttnode)](https://hub.docker.com/r/ericwang2006/ttnode/)-->
 
@@ -12,9 +12,9 @@
 # alpine版本
 
 - 基于官方OpenWrt程序构建
-- 多架构支持
-- uid更新后会发生变化
-- 缓存和armbian版本不兼容(老版本缓存不能使用)
+- 多架构支持(x86 arm32 arm64均为原生程序)
+- 更新后uid会发生变化
+- 需要删除`.yfnode/config`目录，再升级容器，原有缓存才能使用
 - 缓存下载还是一如既往的慢(几天没有缓存也属于正常)
 
 请充分了解以上事项后再决定是否更新，当然欢迎测试并反馈问题。此版本属于测试版，不排除有较多bug。
@@ -128,7 +128,7 @@ docker exec -it ttnode /bin/bash
 
 - 浏览器地址栏输入 `http：//容器IP:1043` (推荐)
 
-- 容器内执行`./usr/node/ttnode -p /mnts`
+- 容器内执行`/usr/node/ttnode -p /mnts`
 
 - 容器外执行`docker logs ttnode`
 

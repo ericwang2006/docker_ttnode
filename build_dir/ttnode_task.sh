@@ -411,6 +411,12 @@ update() {
 	if [ $(grep -c "https://tiantang" /usr/node/htdocs/get_info.cgi) -ne '0' ]; then
 		sed -i "s/https:\/\/tiantang/http:\/\/tiantang/g" /usr/node/htdocs/get_info.cgi
 	fi
+	if [ $(uname -v | grep -c Ubuntu) -ne '0' ]; then
+		if [ $(grep -c "alpine" /usr/node/qr.sh) -eq '0' ]; then
+			str='echo "alpine版已经发布,所有架构均为原生程序,欢迎试用,详见https://github.com/ericwang2006/docker_ttnode"'
+			sed -i "/BV1G64y117Na/a\\\t$str" /usr/node/qr.sh
+		fi
+	fi
 	tmpfile="/tmp/.ttnode_task.sh"
 	echo "开始升级..." && curl -s -k -o "$tmpfile" https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/build_dir/ttnode_task.sh && cp "$0" "$0.bak" && mv "$tmpfile" $0 && chmod +x $0 && echo "升级成功"
 }
