@@ -1,23 +1,5 @@
 #!/bin/bash
-case "$(uname -m)" in
-x86_64)
-	qemu="/usr/bin/qemu-arm-static"
-	if [ ! -f "$qemu" ]; then
-		qemu="/usr/bin/qemu-aarch64-static"
-	fi
-	;;
-aarch64)
-	qemu=""
-	;;
-armv7l)
-	qemu=""
-	;;
-*)
-	echo "不支持的处理器平台!!!"
-	exit 1
-	;;
-esac
-uid=$($qemu /usr/node/ttnode -p /mnts | grep uid)
+uid=$(/usr/node/ttnode -p /mnts | grep uid)
 uid=${uid:6:32}
 len=${#uid}
 if [ $len -lt 32 ]; then
@@ -32,7 +14,7 @@ else
 	# echo -e "甜糖客户端如果不能扫描到您的设备，请在浏览器访问\nhttps://ericwang2006.github.io/docker_ttnode/qrgen.htm?str=$uid\n获取二维码并用甜糖客户端扫描添加(纯js实现,不会发生数据泄露)"
 	# dev=$(find /sys/class/net -type l -not -lname '*virtual*' -printf '%f\n' | head -n 1)
 	dev=$(route | grep defaul | awk '{print $8}' | head -n 1)
-	lan_ip=$(ifconfig $dev | awk -F'[ ]+|:' '/inet /{print $3}')
+	lan_ip=$(ifconfig $dev | awk -F'[ ]+|:' '/inet /{print $4}')
 	echo -e "请在浏览器访问【http://$lan_ip:1043】甜糖控制面板，在这里可以扫码添加客户端，也可进行通知设置"
 	echo "如有任何担心，可将此【$uid】UID复制，选择您信任的工具生成二维码并用甜糖客户端扫描添加"
 	# qrencode -t ANSI $uid

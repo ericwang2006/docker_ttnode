@@ -8,6 +8,18 @@
 [哔哩哔哩](https://www.bilibili.com/video/BV1G64y117Na)
 
 视频教程比较详细，欢迎大家点赞订阅支持一下
+
+# alpine版本
+
+- 基于官方OpenWrt程序构建
+- 多架构支持
+- uid更新后会发生变化
+- 缓存和armbian版本不兼容(老版本缓存不能使用)
+- 缓存下载还是一如既往的慢(几天没有缓存也属于正常)
+
+请充分了解以上事项后再决定是否更新，当然欢迎测试并反馈问题。此版本属于测试版，不排除有较多bug。
+使用方法和老版本相同，只是需要把代码中的`ericwang2006/ttnode`替换成`ericwang2006/ttnode:alpine`
+
 # 甜糖星愿镜像
 
 - 基于debian:stable-slim构建

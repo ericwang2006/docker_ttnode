@@ -408,7 +408,7 @@ auto_turbo() {
 
 update() {
 	sleep300
-	if [ `grep -c "https://tiantang" /usr/node/htdocs/get_info.cgi` -ne '0' ];then
+	if [ $(grep -c "https://tiantang" /usr/node/htdocs/get_info.cgi) -ne '0' ]; then
 		sed -i "s/https:\/\/tiantang/http:\/\/tiantang/g" /usr/node/htdocs/get_info.cgi
 	fi
 	tmpfile="/tmp/.ttnode_task.sh"
