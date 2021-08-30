@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM debian:stable-slim AS builder
+FROM --platform=$TARGETPLATFORM debian:buster-slim AS builder
 
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
@@ -19,7 +19,7 @@ RUN wget -O ./shttpd-1.42.tar.gz https://github.com/ericwang2006/shttpd/archive/
    cd shttpd-1.42/src && \
    LIBS="-lpthread -ldl " make unix
 
-FROM --platform=$TARGETPLATFORM debian:stable-slim
+FROM --platform=$TARGETPLATFORM debian:buster-slim
 
 LABEL maintainer="eric <ericwang2006@gmail.com>"
 
