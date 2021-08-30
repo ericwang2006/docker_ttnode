@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM debian:stable-slim AS builder
+FROM --platform=$TARGETPLATFORM debian:stretch-20210408-slim AS builder
 
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
