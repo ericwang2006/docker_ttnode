@@ -169,6 +169,14 @@ docker exec -it ttnode /bin/bash
 
 	CDN流量去如黄鹤，来如晨风。玩玩就好，何必认真。
 
+6. 内存占用过多，机器跑死
+
+	执行下面命令限制一下容器内存，其中ttnodeA是容器名称，1024M是限制内存使用的上限，这个参数要根据自己机器配置调整。
+
+```
+docker update ttnodeA --memory-swap -1 -m 1024M
+```
+
 ## 已知问题
 
 - 日志中会提示**cannot create /proc/sys/net/core/wmem_max: Directory nonexistent**，是因为在docker中不能设置Linux内核参数，不影响使用
