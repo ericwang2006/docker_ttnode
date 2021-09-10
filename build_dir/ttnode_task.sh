@@ -7,7 +7,7 @@
 if [ -f "/.dockerenv" ]; then
 	CONFIG_DIR="/config"
 else
-	CONFIG_DIR=$(dirname $0)
+	CONFIG_DIR=$(dirname $(readlink -f $0))
 fi
 
 # https协议接口目前不可用,暂时用http协议
