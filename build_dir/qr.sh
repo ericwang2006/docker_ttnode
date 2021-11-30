@@ -1,23 +1,5 @@
 #!/bin/bash
-case "$(uname -m)" in
-x86_64)
-	qemu="/usr/bin/qemu-arm-static"
-	if [ ! -f "$qemu" ]; then
-		qemu="/usr/bin/qemu-aarch64-static"
-	fi
-	;;
-aarch64)
-	qemu=""
-	;;
-armv7l)
-	qemu=""
-	;;
-*)
-	echo "不支持的处理器平台!!!"
-	exit 1
-	;;
-esac
-uid=$($qemu /usr/node/ttnode -p /mnts | grep uid)
+uid=$(/usr/node/ttnode -p /mnts | grep uid)
 uid=${uid:6:32}
 len=${#uid}
 if [ $len -lt 32 ]; then

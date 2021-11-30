@@ -47,12 +47,10 @@ if [[ $DISABLE_ATUO_TASK != "1" ]]; then
 fi
 
 if [[ $DISABLE_CONTROL_PANEL != "1" ]]; then
-	# /usr/node/thttpd -u root -p 1043 -d /usr/node/htdocs -c "**.cgi"
 	/usr/node/shttpd -root /usr/node/htdocs -ports 1043 &
 fi
 
-arch=$(uname -m)
-if [[ $arch = "x86_64" ]] && [[ $DISABLE_IPDBCF = "1" ]]; then
+if [[ $DISABLE_IPDBCF = "1" ]]; then
 	if [ ! -f "/usr/bin/killall" ]; then
 		echo '#!/bin/bash' >/usr/bin/killall && chmod +x /usr/bin/killall
 	fi
@@ -63,38 +61,8 @@ if [[ $arch = "x86_64" ]] && [[ $DISABLE_IPDBCF = "1" ]]; then
 		chmod +x $ipdbcf
 	fi
 
-	# if [[ $KEEP_ONE_IPDBCF != "True" ]]; then
-	# bin_ipdbcf="/mnts/.ipdbcf/ipdbcf"
-	# if [ ! -f "$bin_ipdbcf" ]; then
-	# mkdir -p /mnts/.ipdbcf
-	# curl -L -k -o $bin_ipdbcf.down https://cdn.jsdelivr.net/gh/ericwang2006/docker_ttnode/$(uname -m)/ipdbcf && mv $bin_ipdbcf.down $bin_ipdbcf && chmod +x $bin_ipdbcf
-	# if [ $? -eq 0 ]; then
-	# qemu="/usr/bin/qemu-arm-static"
-	# if [ ! -f "$qemu" ]; then
-	# qemu="/usr/bin/qemu-aarch64-static"
-	# fi
-	# echo '#!/bin/bash' >$ipdbcf
-	# echo "num=\$(ps fax | grep '$bin_ipdbcf' | egrep -v 'grep|echo|rpm|moni|guard' | wc -l)" >>$ipdbcf
-	# echo 'if [ $num -lt 1 ]; then' >>$ipdbcf
-	# echo "	$qemu $bin_ipdbcf \$@" >>$ipdbcf
-	# echo 'fi' >>$ipdbcf
-	# chmod +x $ipdbcf
-	# fi
-	# fi
-	# fi
-
 	echo -e "#!/bin/bash\necho ipdbcf" >/mnts/ipdbcf && chmod +x /mnts/ipdbcf
 	mount --bind $ipdbcf /mnts/ipdbcf >/dev/null 2>&1
-
-	# if [ -d "/proc/sys/fs/binfmt_misc" ]; then
-	# if [ ! -f "/proc/sys/fs/binfmt_misc/qemu-arm" ]; then
-	# /usr/node/qemu-binfmt-conf.sh --qemu-path /usr/bin --qemu-suffix -static >/dev/null 2>&1
-	# fi
-	# else
-	# d=$(date '+%F %T')
-	# echo "[$d] 当前宿主机系统不支持binfmt_misc,新版甜糖(v194+)不能正常运行(注:大部分openwrt系统未开启binfmt_misc)"
-	# exit 2
-	# fi
 fi
 
 foundport=0
@@ -105,37 +73,19 @@ while true; do
 	if [ $num -lt 1 ]; then
 		d=$(date '+%F %T')
 		echo "[$d] ttnode进程不存在,启动ttnode"
-		case "$arch" in
-		x86_64)
-			qemu="/usr/bin/qemu-arm-static"
-			if [ ! -f "$qemu" ]; then
-				qemu="/usr/bin/qemu-aarch64-static"
-			fi
-			;;
-		aarch64)
-			qemu=""
-			;;
-		armv7l)
-			qemu=""
-			;;
-		*)
-			echo "unsupported CPU architecture!"
-			exit 1
-			;;
-		esac
-		$qemu /usr/node/ttnode -p /mnts
+		/usr/node/ttnode -p /mnts
 		/usr/node/qr.sh
 	fi
 
 	if [ $foundport -eq 0 ]; then
-		netstat -tunlp | grep "$(ps fax | grep '/ttnode' | egrep -v 'grep|echo|rpm|moni|guard' | awk '{print $1}')/" | grep -v '127.0.0.1\|17331' | awk '{sub(/0.0.0.0:/,""); print $1,$4}' | sort -k 2n -k 1 >/usr/node/port.txt
+		netstat -tunlp | grep '/ttnode' | grep -v '127.0.0.1\|17331' | awk '{sub(/0.0.0.0:/,""); print $1,$4}' | sort -k 2n -k 1 >/usr/node/port.txt
 		len=$(sed -n '$=' /usr/node/port.txt)
 		if [[ $len -gt 4 ]]; then
 			new_port=$(cat /usr/node/port.txt)
 			if [ "$old_port" != "$new_port" ]; then
 				old_port=$new_port
 				echo "==========================================================================="
-				echo $($qemu /usr/node/ttnode -h | head -n 1)
+				echo $(/usr/node/ttnode -h | head -n 1)
 				d=$(date '+%F %T')
 				echo "[$d] 如果UPNP失效，请在路由器上对下列端口做转发"
 				cat /usr/node/port.txt | awk '{print $1,$2" "}'
