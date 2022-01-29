@@ -35,7 +35,7 @@ docker run -itd \
 # 甜糖星愿镜像
 
 - 基于debian:stable-slim构建
-- 多架构支持,目前支持linux/amd64,linux/arm/v7,linux/arm64(其中amd64镜像内部使用QEMU模拟arm32)
+- 多架构支持,目前支持linux/amd64,linux/arm/v7,linux/arm64(~~其中amd64镜像内部使用QEMU模拟arm32~~目前全部架构下都是原生支持)
 - 去除了crontab任务，改用脚本监控ttndoe进程
 - 提供网页控制面板查询UID,设置通知参数,只需访问 [http://容器IP:1043](http://容器IP:1043) ,网页的web服务使用[thttpd](http://www.acme.com/software/thttpd/),一个开源的轻量级的HTTP服务，只有100多K
 - docker日志中直接查询UID
