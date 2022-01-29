@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/docker/stars/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/pulls/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/image-size/ericwang2006/ttnode/latest"/>
+<img src="https://img.shields.io/docker/stars/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/pulls/ericwang2006/ttnode.svg"/><img src="https://img.shields.io/docker/image-size/ericwang2006/ttnode/alpine"/>
 
 <!--[![nodesource/node](http://dockeri.co/image/ericwang2006/ttnode)](https://hub.docker.com/r/ericwang2006/ttnode/)-->
 
@@ -8,6 +8,30 @@
 [哔哩哔哩](https://www.bilibili.com/video/BV1G64y117Na)
 
 视频教程比较详细，欢迎大家点赞订阅支持一下
+
+# 特别说明
+
+目前**甜糖官方已经提供了docker方案**，建议大家尽量使用甜糖官方docker镜像，使用本项目不能确保获取及时的更新。如果只想使用本镜像的*自动收割星愿和自动提现的功能*，可以把环境变量DISABLE_TTNODE设置成1，参考代码：
+```
+docker run -itd \
+  -v /your/cache/path:/mnts \
+  -e DISABLE_TTNODE=1 \
+  -p 1043:1043 \
+  --name ttnode \
+  --restart=always \
+  ericwang2006/ttnode:alpine
+```
+# alpine版本
+
+- 基于官方OpenWrt程序构建
+- 多架构支持(x86 arm32 arm64均为原生程序)
+- 更新后uid会发生变化
+- 需要删除`.yfnode/config`目录，再升级容器，原有缓存才能使用
+- 缓存下载还是一如既往的慢(几天没有缓存也属于正常)
+
+请充分了解以上事项后再决定是否更新，当然欢迎测试并反馈问题。此版本属于测试版，不排除有较多bug。
+使用方法和老版本相同，只是需要把代码中的`ericwang2006/ttnode`替换成`ericwang2006/ttnode:alpine`
+
 # 甜糖星愿镜像
 
 - 基于debian:stable-slim构建
@@ -116,7 +140,7 @@ docker exec -it ttnode /bin/bash
 
 - 浏览器地址栏输入 `http：//容器IP:1043` (推荐)
 
-- 容器内执行`./usr/node/ttnode -p /mnts`
+- 容器内执行`/usr/node/ttnode -p /mnts`
 
 - 容器外执行`docker logs ttnode`
 
@@ -127,6 +151,7 @@ docker exec -it ttnode /bin/bash
 | DISABLE_ATUO_TASK | 自动收星愿 | 1 | 禁用 | 非1 | 启用 |
 | DISABLE_CONTROL_PANEL | 控制面板 | 1 | 禁用 | 非1 | 启用 |
 | DISABLE_IPDBCF | 禁用ipdbcf进程 | 1 | 禁用ipdbcf进程 | 非1 | 不做任何处理 |
+| DISABLE_TTNODE | 禁用甜糖服务 | 1 | 禁用甜糖服务，仍可使用自动收割星愿和自动提现的功能 | 非1 | 不做任何处理 |
 
 ## FAQ
 1. 怎么多开?
@@ -156,7 +181,7 @@ docker exec -it ttnode /bin/bash
 5. 为什么我是优质网络，但却一直没有流量？
 
 	CDN流量去如黄鹤，来如晨风。玩玩就好，何必认真。
-	
+
 6. 内存占用过多，机器跑死
 
 	执行下面命令限制一下容器内存，其中ttnodeA是容器名称，1024M是限制内存使用的上限，这个参数要根据自己机器配置调整。
