@@ -9,6 +9,18 @@
 
 视频教程比较详细，欢迎大家点赞订阅支持一下
 
+# 特别说明
+
+目前**甜糖官方已经提供了docker方案**，建议大家尽量使用甜糖官方docker镜像，使用本项目不能确保获取及时的更新。如果只想使用本镜像的*自动收割星愿和自动提现的功能*，可以把环境变量DISABLE_TTNODE设置成1，参考代码：
+```
+docker run -itd \
+  -v /your/cache/path:/mnts \
+  -e DISABLE_TTNODE=1 \
+  -p 1043:1043 \
+  --name ttnode \
+  --restart=always \
+  ericwang2006/ttnode:alpine
+```
 # alpine版本
 
 - 基于官方OpenWrt程序构建
@@ -139,6 +151,7 @@ docker exec -it ttnode /bin/bash
 | DISABLE_ATUO_TASK | 自动收星愿 | 1 | 禁用 | 非1 | 启用 |
 | DISABLE_CONTROL_PANEL | 控制面板 | 1 | 禁用 | 非1 | 启用 |
 | DISABLE_IPDBCF | 禁用ipdbcf进程 | 1 | 禁用ipdbcf进程 | 非1 | 不做任何处理 |
+| DISABLE_TTNODE | 禁用甜糖服务 | 1 | 禁用甜糖服务，仍可使用自动收割星愿和自动提现的功能 | 非1 | 不做任何处理 |
 
 ## FAQ
 1. 怎么多开?

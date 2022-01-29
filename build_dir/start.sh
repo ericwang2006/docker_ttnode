@@ -65,6 +65,15 @@ if [[ $DISABLE_IPDBCF = "1" ]]; then
 	mount --bind $ipdbcf /mnts/ipdbcf >/dev/null 2>&1
 fi
 
+if [[ $DISABLE_TTNODE = "1" ]]; then
+	echo "甜糖服务已禁用,如需启用请将DISABLE_TTNODE环境变量设置成0或者删除" >/usr/node/port.txt
+	echo "您仍可使用自动收割星愿和自动提现的功能" >>/usr/node/port.txt
+	echo "" >/usr/node/iptables.txt
+	cat /usr/node/port.txt
+	/bin/bash
+	exit 0
+fi
+
 foundport=0
 last=$(date +%s)
 old_port=""
@@ -73,7 +82,7 @@ while true; do
 	if [ $num -lt 1 ]; then
 		d=$(date '+%F %T')
 		echo "[$d] ttnode进程不存在,启动ttnode"
-		/usr/node/ttnode -p /mnts &
+		/usr/node/ttnode -p /mnts --daemon --idfile /usr/node/uid.txt
 		/usr/node/qr.sh
 	fi
 
@@ -85,7 +94,7 @@ while true; do
 			if [ "$old_port" != "$new_port" ]; then
 				old_port=$new_port
 				echo "==========================================================================="
-				echo $(/usr/node/ttnode -h | head -n 1)
+				echo $(/usr/node/ttnode --version)
 				d=$(date '+%F %T')
 				echo "[$d] 如果UPNP失效，请在路由器上对下列端口做转发"
 				cat /usr/node/port.txt | awk '{print $1,$2" "}'
