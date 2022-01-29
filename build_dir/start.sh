@@ -67,8 +67,9 @@ fi
 
 if [[ $DISABLE_TTNODE = "1" ]]; then
 	echo "甜糖服务已禁用,如需启用请将DISABLE_TTNODE环境变量设置成0或者删除" >/usr/node/port.txt
-	echo "您仍可使用自动收割星愿和自动提现的功能" >>/usr/node/port.txt
-	echo "" >/usr/node/iptables.txt
+	echo "您目前仍可使用自动收割星愿和自动提现的功能" >>/usr/node/port.txt
+	echo "N/A" >/usr/node/uid.txt
+	echo "N/A" >/usr/node/iptables.txt
 	cat /usr/node/port.txt
 	/bin/bash
 	exit 0
