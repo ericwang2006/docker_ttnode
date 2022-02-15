@@ -25,7 +25,7 @@ function sleep300() {
 }
 
 function move_config() {
-	OLD_DIR=$(dirname $0)
+	OLD_DIR=$(dirname $(readlink -f $0))
 	if [[ $OLD_DIR != $CONFIG_DIR ]]; then
 		mkdir -p "$CONFIG_DIR"
 		f="config.json"
