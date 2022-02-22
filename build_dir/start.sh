@@ -83,8 +83,8 @@ while true; do
 	if [ $num -lt 1 ]; then
 		d=$(date '+%F %T')
 		echo "[$d] ttnode进程不存在,启动ttnode"
-		/usr/node/ttnode -p /mnts --daemon --idfile /usr/node/uid.txt
-		/usr/node/qr.sh
+		/usr/node/ttnode -p /mnts --daemon --idfile /usr/node/uid.txt &
+		/usr/node/qr.sh &
 	fi
 
 	if [ $foundport -eq 0 ]; then
