@@ -102,6 +102,12 @@ escape() {
 }
 
 withdraw() {
+	d=$(date "+%Y-%m-%d %H:%M:%S")
+	m=$(echo -e "$d\n大家还是手动提现吧!")
+	notify "$(escape "$m")"
+	echo "$m"
+	exit 0
+
 	cfile="$CONFIG_DIR/config.json"
 	mfile="$CONFIG_DIR/msg.txt"
 	if [ ! -f "$cfile" ]; then
