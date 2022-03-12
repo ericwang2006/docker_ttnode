@@ -19,7 +19,7 @@ RUN wget -O ./shttpd-1.42.tar.gz https://github.com/ericwang2006/shttpd/archive/
    cd shttpd-1.42/src && \
    LIBS="-lpthread -ldl " make unix
 
-FROM --platform=$TARGETPLATFORM debian:buster-slim
+FROM --platform=$TARGETPLATFORM debian:buster-20220125-slim
 
 LABEL maintainer="eric <ericwang2006@gmail.com>"
 
@@ -30,7 +30,7 @@ ENV LANG C.UTF-8
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
-    apt-get update && apt-get install openssl cron procps net-tools iputils-ping ca-certificates curl jq nano bc psmisc traceroute -y --no-install-recommends && \
+    apt-get update && apt-get install openssl cron procps net-tools iputils-ping ca-certificates curl jq nano bc psmisc traceroute iptables -y --no-install-recommends && \
     echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo 'Asia/Shanghai' >/etc/timezone && \
