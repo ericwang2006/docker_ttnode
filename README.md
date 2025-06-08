@@ -250,5 +250,3 @@ docker update ttnodeA --memory-swap -1 -m 1024M
    - 也希望官方尽早推出x86原生程序，x86设备众多，性能和稳定性都有一定优势
 
 #### 如果觉得还有点用，麻烦用一下我的邀请码631441，有加成卡15张，我也有推广收入
-
-[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
